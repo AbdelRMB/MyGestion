@@ -5,8 +5,8 @@ pipeline {
         githubPush()
     }
 
-    environment {
-    }
+    // environment {
+    // }
 
     stages {
         stage('Install dependencies (with dev deps)') {
