@@ -96,7 +96,15 @@ export const featuresAPI = {
       body: JSON.stringify(body),
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Erreur lors de la création');
+    if (!response.ok) {
+      // Construire un message d'erreur riche si le backend renvoie des détails
+      let msg = data.message || 'Erreur lors de la création';
+      if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+        const extra = data.errors.map(e => e.msg || e.message || JSON.stringify(e)).join('; ');
+        msg = `${msg}: ${extra}`;
+      }
+      throw new Error(msg);
+    }
     return data;
   },
 
