@@ -123,13 +123,15 @@ export default function SpecificationDetail({ specification, onBack }) {
   // Prevent toggling a feature that has children (they are auto-managed)
   const toggleFeatureCompletion = async (feature) => {
     if (hasChildren(feature.id)) return;
+    
+    const wasCompleted = feature.isCompleted;
+    
     try {
       await featuresAPI.update(feature.id, { isCompleted: !feature.isCompleted });
-      // reload features to get canonical state from server
-      await loadFeatures();
-      // reconcile parents after a child changed
+      toast.addToast(wasCompleted ? 'Tâche réouverte' : 'Tâche complétée', { type: 'success' });
+      
+      // reconcile parents after a child changed - this will reload features internally
       await reconcileParentsFrom(feature.id);
-      toast.addToast(feature.isCompleted ? 'Tâche réouverte' : 'Tâche complétée', { type: 'success' });
     } catch (error) {
       toast.addToast(error.message || 'Erreur lors de la mise à jour', { type: 'error' });
     }
@@ -137,27 +139,41 @@ export default function SpecificationDetail({ specification, onBack }) {
 
   // After a child (id) changed, ensure parent tasks reflect children completion state
   const reconcileParentsFrom = async (childId) => {
+    // Reload features first to get latest state
+    await loadFeatures();
+    
     let current = features.find((f) => f.id === childId);
     if (!current) return;
+    
     let parentId = current.parentId ?? null;
+    let hasUpdated = false;
+    
     // walk up the chain
     while (parentId) {
       const parent = features.find((f) => f.id === parentId);
       if (!parent) break;
+      
       const children = getChildren(parent.id);
       const allDone = children.length > 0 && children.every((c) => c.isCompleted === true);
+      
       try {
         if (allDone && !parent.isCompleted) {
           await featuresAPI.update(parent.id, { isCompleted: true });
+          hasUpdated = true;
         } else if (!allDone && parent.isCompleted) {
           await featuresAPI.update(parent.id, { isCompleted: false });
+          hasUpdated = true;
         }
       } catch (err) {
         console.warn('Reconcile parent error', err);
       }
-      // move up
+      
+      // move up to next parent
       parentId = parent.parentId ?? null;
-      // refresh features after updating parent to keep state consistent for next loop
+    }
+    
+    // Reload features one final time if we made updates
+    if (hasUpdated) {
       await loadFeatures();
     }
   };
@@ -241,7 +257,7 @@ export default function SpecificationDetail({ specification, onBack }) {
             </div>
           </form>
         ) : (
-          <div className="p-5" style={{ paddingLeft: `${(level - 1) * 20 + 20}px` }}>
+          <div className={`p-5 ${level > 1 ? 'ml-8 border-l-2 border-slate-200' : ''}`}>
             <div className="flex items-start gap-4">
               {/* hide completion toggle when feature has children */}
               {!hasChildren(feature.id) ? (
@@ -287,13 +303,15 @@ export default function SpecificationDetail({ specification, onBack }) {
                   {expandedForThis ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   {expandedForThis ? 'Masquer les sous-tâches' : `Afficher ${children.length} sous-tâche(s)`}
                 </button>
-                {expandedForThis && (
-                  <div className="mt-3 space-y-2">
-                    {children.map((child, idx) => (
-                      <FeatureItem key={child.id} feature={child} level={level + 1} index={idx} />
-                    ))}
-                  </div>
-                )}
+              </div>
+            )}
+            
+            {/* Render children directly below when expanded */}
+            {hasChildren(feature.id) && expandedForThis && (
+              <div className="mt-2">
+                {children.map((child, idx) => (
+                  <FeatureItem key={child.id} feature={child} level={level + 1} index={idx} />
+                ))}
               </div>
             )}
           </div>
