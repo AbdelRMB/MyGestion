@@ -44,7 +44,12 @@ export default function SpecificationDetail({ specification, onBack }) {
     const title = formData.get('title');
     const description = formData.get('description');
 
-    const maxOrder = features.length > 0 ? Math.max(...features.map(f => f.orderIndex)) : -1;
+    const maxOrder = features.length > 0
+      ? Math.max(...features.map(f => {
+          const v = Number(f.orderIndex);
+          return Number.isFinite(v) && !Number.isNaN(v) ? Math.floor(v) : 0;
+        }))
+      : -1;
 
     try {
       const level = Number(formData.get('level') || 1);

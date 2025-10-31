@@ -86,9 +86,15 @@ export const featuresAPI = {
   },
 
   create: async (specificationId, title, description, orderIndex, level = 1, parentId = null) => {
-    const body = { title, description, orderIndex };
-    if (level !== undefined) body.level = level;
-    if (parentId !== undefined) body.parentId = parentId;
+    const body = { title, description };
+    // ensure orderIndex is an integer (fallback to 0)
+    const idx = Number(orderIndex);
+    body.orderIndex = Number.isFinite(idx) && !Number.isNaN(idx) ? Math.floor(idx) : 0;
+    if (level !== undefined) body.level = Number(level);
+    // only include parentId if it's a valid integer
+    if (parentId !== undefined && parentId !== null && Number.isInteger(Number(parentId))) {
+      body.parentId = Number(parentId);
+    }
 
     const response = await fetch(`${API_URL}/specifications/${specificationId}/features`, {
       method: 'POST',
