@@ -14,7 +14,7 @@ pipeline {
         stage('Install dependencies (with dev deps)') {
             steps {
                 sh '''
-                npm install
+                npm install vite
                 '''
             }
         }
