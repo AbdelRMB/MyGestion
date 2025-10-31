@@ -8,6 +8,27 @@ const getAuthHeaders = () => {
   };
 };
 
+// Normalize server feature objects (snake_case) to frontend-friendly camelCase
+const normalizeFeature = (f) => {
+  if (!f || typeof f !== 'object') return f;
+  return {
+    id: f.id,
+    title: f.title,
+    description: f.description,
+    isCompleted: f.is_completed === 1 || f.is_completed === true || f.isCompleted === true,
+    orderIndex: Number.isFinite(Number(f.order_index)) ? Number(f.order_index) : (f.orderIndex || 0),
+    level: Number.isFinite(Number(f.level)) ? Number(f.level) : (f.level || 1),
+    parentId: f.parent_id ?? f.parentId ?? null,
+    specificationId: f.specification_id ?? f.specificationId ?? null,
+    createdAt: f.created_at ?? f.createdAt ?? null,
+    updatedAt: f.updated_at ?? f.updatedAt ?? null,
+    // include any other fields unchanged
+    ...Object.fromEntries(Object.entries(f).filter(([k]) => ![
+      'id','title','description','is_completed','isCompleted','order_index','orderIndex','level','parent_id','parentId','specification_id','specificationId','created_at','createdAt','updated_at','updatedAt'
+    ].includes(k)))
+  };
+};
+
 export const authAPI = {
   signup: async (email, password) => {
     const response = await fetch(`${API_URL}/auth/signup`, {
@@ -81,8 +102,13 @@ export const featuresAPI = {
     const response = await fetch(`${API_URL}/specifications/${specificationId}/features`, {
       headers: getAuthHeaders(),
     });
-    if (!response.ok) throw new Error('Erreur lors du chargement des fonctionnalités');
-    return await response.json();
+    const data = await response.json();
+    if (!response.ok) {
+      const msg = data && data.message ? data.message : 'Erreur lors du chargement des fonctionnalités';
+      throw new Error(msg);
+    }
+    // Normalize array of features
+    return Array.isArray(data) ? data.map(normalizeFeature) : data;
   },
 
   create: async (specificationId, title, description, orderIndex, level = 1, parentId = null) => {
@@ -104,14 +130,14 @@ export const featuresAPI = {
     const data = await response.json();
     if (!response.ok) {
       // Construire un message d'erreur riche si le backend renvoie des détails
-      let msg = data.message || 'Erreur lors de la création';
-      if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+      let msg = data && data.message ? data.message : 'Erreur lors de la création';
+      if (data && data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
         const extra = data.errors.map(e => e.msg || e.message || JSON.stringify(e)).join('; ');
         msg = `${msg}: ${extra}`;
       }
       throw new Error(msg);
     }
-    return data;
+    return normalizeFeature(data);
   },
 
   update: async (id, updates) => {
@@ -121,8 +147,11 @@ export const featuresAPI = {
       body: JSON.stringify(updates),
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Erreur lors de la mise à jour');
-    return data;
+    if (!response.ok) {
+      const msg = data && data.message ? data.message : 'Erreur lors de la mise à jour';
+      throw new Error(msg);
+    }
+    return normalizeFeature(data);
   },
 
   delete: async (id) => {

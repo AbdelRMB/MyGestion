@@ -20,6 +20,9 @@ export default function SpecificationDetail({ specification, onBack }) {
   const [editingFeature, setEditingFeature] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const toast = useToast();
+  const [addLevel, setAddLevel] = useState(1);
+  const [addParentId, setAddParentId] = useState('');
+  const [expanded, setExpanded] = useState({});
 
   useEffect(() => {
     loadFeatures();
@@ -38,6 +41,27 @@ export default function SpecificationDetail({ specification, onBack }) {
     }
   };
 
+  const hasLevel1 = features.some((f) => Number(f.level || 1) === 1);
+  const hasLevel2 = features.some((f) => Number(f.level || 1) === 2);
+  const maxLevelAllowed = !hasLevel1 ? 1 : hasLevel1 && !hasLevel2 ? 2 : 3;
+
+  const openAddModal = () => {
+    setAddLevel(1);
+    setAddParentId('');
+    setShowAddFeature(true);
+  };
+
+  // helpers to organize features by level and parent
+  const levelList = (lvl) => features.filter((f) => Number(f.level || 1) === lvl);
+  const childrenMap = features.reduce((acc, f) => {
+    const pid = f.parentId ?? f.parent_id ?? null;
+    if (pid) {
+      acc[pid] = acc[pid] || [];
+      acc[pid].push(f);
+    }
+    return acc;
+  }, {});
+
   const handleAddFeature = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -52,9 +76,10 @@ export default function SpecificationDetail({ specification, onBack }) {
       : -1;
 
     try {
-      const level = Number(formData.get('level') || 1);
-      const parentIdRaw = formData.get('parentId');
-      const parentId = parentIdRaw === 'null' ? null : parentIdRaw ? Number(parentIdRaw) : undefined;
+      // prefer controlled values when available
+      const level = addLevel || Number(formData.get('level') || 1);
+      const parentIdRaw = addParentId !== '' ? addParentId : formData.get('parentId');
+      const parentId = parentIdRaw === 'null' || parentIdRaw === '' ? undefined : parentIdRaw ? Number(parentIdRaw) : undefined;
 
       await featuresAPI.create(specification.id, title, description, maxOrder + 1, level, parentId);
       setShowAddFeature(false);
@@ -173,7 +198,7 @@ export default function SpecificationDetail({ specification, onBack }) {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-slate-900">Fonctionnalités</h2>
           <button
-            onClick={() => setShowAddFeature(true)}
+            onClick={openAddModal}
             className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md"
           >
             <Plus className="w-5 h-5" />
@@ -195,7 +220,7 @@ export default function SpecificationDetail({ specification, onBack }) {
               Ajoutez des fonctionnalités à votre cahier des charges
             </p>
             <button
-              onClick={() => setShowAddFeature(true)}
+              onClick={openAddModal}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
               <Plus className="w-5 h-5" />
@@ -248,10 +273,12 @@ export default function SpecificationDetail({ specification, onBack }) {
                       <label htmlFor="parentId" className="block text-sm font-medium text-slate-700 mb-2">
                         Parent (optionnel)
                       </label>
-                      <select id="parentId" name="parentId" defaultValue={feature.parentId ?? ''} className="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                      <select id="parentId" name="parentId" defaultValue={feature.parent_id ?? feature.parentId ?? ''} className="w-full px-4 py-2 border border-slate-300 rounded-lg">
                         <option value="">Aucun</option>
-                        {features.filter(f => f.id !== feature.id).map((f) => (
-                          <option key={f.id} value={f.id}>{`${f.title} (niveau ${f.level || 1})`}</option>
+                        {features
+                          .filter((f) => f.id !== feature.id && Number(f.level || 1) === (Number(feature.level || 1) - 1))
+                          .map((f) => (
+                            <option key={f.id} value={f.id}>{`${f.title} (niveau ${f.level || 1})`}</option>
                         ))}
                       </select>
                     </div>
@@ -333,7 +360,34 @@ export default function SpecificationDetail({ specification, onBack }) {
                           </button>
                         </div>
                       </div>
-                    </div>
+                      </div>
+
+                      {/* children toggle */}
+                      {childrenMap[feature.id] && childrenMap[feature.id].length > 0 && (
+                        <div className="mt-3 px-5 pb-4">
+                          <button
+                            onClick={() => setExpanded((s) => ({ ...s, [feature.id]: !s[feature.id] }))}
+                            className="text-sm text-blue-600 hover:underline"
+                          >
+                            {expanded[feature.id] ? 'Masquer les sous-tâches' : `Afficher ${childrenMap[feature.id].length} sous-tâche(s)`}
+                          </button>
+                          {expanded[feature.id] && (
+                            <div className="mt-2 space-y-2 pl-4">
+                              {childrenMap[feature.id].map((child) => (
+                                <div key={child.id} className="bg-slate-50 border border-slate-100 rounded-lg p-3">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <div className="text-sm font-medium">{child.title} <span className="text-xs text-slate-500">(niveau {child.level || 1})</span></div>
+                                      {child.description && <div className="text-xs text-slate-500">{child.description}</div>}
+                                    </div>
+                                    <div className="text-xs text-slate-500">{child.isCompleted ? '✓' : ''}</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                   </div>
                 )}
               </div>
@@ -369,24 +423,40 @@ export default function SpecificationDetail({ specification, onBack }) {
                 <label htmlFor="level" className="block text-sm font-medium text-slate-700 mb-2">
                   Niveau
                 </label>
-                <select id="level" name="level" className="w-full px-4 py-3 border border-slate-300 rounded-lg mb-2">
-                  <option value={1}>1</option>
-                  <option value={2}>2</option>
-                  <option value={3}>3</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="parentId" className="block text-sm font-medium text-slate-700 mb-2">
-                  Parent (optionnel)
-                </label>
-                <select id="parentId" name="parentId" className="w-full px-4 py-3 border border-slate-300 rounded-lg">
-                  <option value="">Aucun</option>
-                  {features.map((f) => (
-                    <option key={f.id} value={f.id}>{`${f.title} (niveau ${f.level || 1})`}</option>
+                <select
+                  id="level"
+                  name="level"
+                  value={addLevel}
+                  onChange={(e) => { setAddLevel(Number(e.target.value)); setAddParentId(''); }}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg mb-2"
+                >
+                  {Array.from({ length: maxLevelAllowed }, (_, i) => i + 1).map((v) => (
+                    <option key={v} value={v}>{v}</option>
                   ))}
                 </select>
               </div>
+
+              {addLevel > 1 && (
+                <div>
+                  <label htmlFor="parentId" className="block text-sm font-medium text-slate-700 mb-2">
+                    Parent (optionnel)
+                  </label>
+                  <select
+                    id="parentId"
+                    name="parentId"
+                    value={addParentId}
+                    onChange={(e) => setAddParentId(e.target.value)}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg"
+                  >
+                    <option value="">Aucun</option>
+                    {features
+                      .filter((f) => Number(f.level || 1) === addLevel - 1)
+                      .map((f) => (
+                        <option key={f.id} value={f.id}>{`${f.title} (niveau ${f.level || 1})`}</option>
+                      ))}
+                  </select>
+                </div>
+              )}
               <div>
                 <label
                   htmlFor="description"
