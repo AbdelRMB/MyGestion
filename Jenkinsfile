@@ -14,7 +14,7 @@ pipeline {
         stage('Install dependencies (with dev deps)') {
             steps {
                 sh '''
-                npm install vite
+                npm_config_production=false npm ci
                 '''
             }
         }
