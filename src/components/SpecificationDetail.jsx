@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { featuresAPI } from '../lib/api';
+import { useToast } from '../contexts/ToastContext';
 import {
   ArrowLeft,
   Plus,
@@ -17,6 +18,8 @@ export default function SpecificationDetail({ specification, onBack }) {
   const [loading, setLoading] = useState(true);
   const [showAddFeature, setShowAddFeature] = useState(false);
   const [editingFeature, setEditingFeature] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+  const toast = useToast();
 
   useEffect(() => {
     loadFeatures();
@@ -44,11 +47,16 @@ export default function SpecificationDetail({ specification, onBack }) {
     const maxOrder = features.length > 0 ? Math.max(...features.map(f => f.orderIndex)) : -1;
 
     try {
-      await featuresAPI.create(specification.id, title, description, maxOrder + 1);
+      const level = Number(formData.get('level') || 1);
+      const parentIdRaw = formData.get('parentId');
+      const parentId = parentIdRaw === 'null' ? null : parentIdRaw ? Number(parentIdRaw) : undefined;
+
+      await featuresAPI.create(specification.id, title, description, maxOrder + 1, level, parentId);
       setShowAddFeature(false);
       loadFeatures();
+      toast.addToast('Fonctionnalité créée', { type: 'success' });
     } catch (error) {
-      alert(error.message);
+      toast.addToast(error.message || 'Erreur lors de la création', { type: 'error' });
     }
   };
 
@@ -59,11 +67,20 @@ export default function SpecificationDetail({ specification, onBack }) {
     const description = formData.get('description');
 
     try {
-      await featuresAPI.update(featureId, { title, description });
+      const level = Number(formData.get('level') || undefined);
+      const parentIdRaw = formData.get('parentId');
+      const parentId = parentIdRaw === 'null' ? null : parentIdRaw ? Number(parentIdRaw) : undefined;
+
+      const updates = { title, description };
+      if (!Number.isNaN(level)) updates.level = level;
+      if (parentIdRaw !== null) updates.parentId = parentId;
+
+      await featuresAPI.update(featureId, updates);
       setEditingFeature(null);
       loadFeatures();
+      toast.addToast('Fonctionnalité mise à jour', { type: 'success' });
     } catch (error) {
-      alert(error.message);
+      toast.addToast(error.message || 'Erreur lors de la mise à jour', { type: 'error' });
     }
   };
 
@@ -75,21 +92,25 @@ export default function SpecificationDetail({ specification, onBack }) {
           f.id === feature.id ? { ...f, isCompleted: !f.isCompleted } : f
         )
       );
+      toast.addToast(feature.isCompleted ? 'Tâche réouverte' : 'Tâche complétée', { type: 'success' });
     } catch (error) {
-      alert(error.message);
+      toast.addToast(error.message || 'Erreur lors de la mise à jour', { type: 'error' });
     }
   };
 
   const handleDeleteFeature = async (featureId) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette fonctionnalité?')) {
-      return;
-    }
+    setShowDeleteConfirm(featureId);
+  };
 
+  const confirmDelete = async () => {
+    const featureId = showDeleteConfirm;
+    setShowDeleteConfirm(null);
     try {
       await featuresAPI.delete(featureId);
       loadFeatures();
+      toast.addToast('Fonctionnalité supprimée', { type: 'success' });
     } catch (error) {
-      alert(error.message);
+      toast.addToast(error.message || 'Erreur lors de la suppression', { type: 'error' });
     }
   };
 
@@ -188,10 +209,10 @@ export default function SpecificationDetail({ specification, onBack }) {
                 }`}
               >
                 {editingFeature === feature.id ? (
-                  <form
-                    onSubmit={(e) => handleUpdateFeature(feature.id, e)}
-                    className="p-5"
-                  >
+                    <form
+                      onSubmit={(e) => handleUpdateFeature(feature.id, e)}
+                      className="p-5"
+                    >
                     <input
                       type="text"
                       name="title"
@@ -207,6 +228,28 @@ export default function SpecificationDetail({ specification, onBack }) {
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg mb-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                       placeholder="Description (optionnel)"
                     />
+                    <div className="mb-3">
+                      <label htmlFor="level" className="block text-sm font-medium text-slate-700 mb-2">
+                        Niveau
+                      </label>
+                      <select id="level" name="level" defaultValue={feature.level || 1} className="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        <option value={1}>1</option>
+                        <option value={2}>2</option>
+                        <option value={3}>3</option>
+                      </select>
+                    </div>
+
+                    <div className="mb-3">
+                      <label htmlFor="parentId" className="block text-sm font-medium text-slate-700 mb-2">
+                        Parent (optionnel)
+                      </label>
+                      <select id="parentId" name="parentId" defaultValue={feature.parentId ?? ''} className="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        <option value="">Aucun</option>
+                        {features.filter(f => f.id !== feature.id).map((f) => (
+                          <option key={f.id} value={f.id}>{`${f.title} (niveau ${f.level || 1})`}</option>
+                        ))}
+                      </select>
+                    </div>
                     <div className="flex gap-2">
                       <button
                         type="submit"
@@ -318,6 +361,28 @@ export default function SpecificationDetail({ specification, onBack }) {
                 />
               </div>
               <div>
+                <label htmlFor="level" className="block text-sm font-medium text-slate-700 mb-2">
+                  Niveau
+                </label>
+                <select id="level" name="level" className="w-full px-4 py-3 border border-slate-300 rounded-lg mb-2">
+                  <option value={1}>1</option>
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="parentId" className="block text-sm font-medium text-slate-700 mb-2">
+                  Parent (optionnel)
+                </label>
+                <select id="parentId" name="parentId" className="w-full px-4 py-3 border border-slate-300 rounded-lg">
+                  <option value="">Aucun</option>
+                  {features.map((f) => (
+                    <option key={f.id} value={f.id}>{`${f.title} (niveau ${f.level || 1})`}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
                 <label
                   htmlFor="description"
                   className="block text-sm font-medium text-slate-700 mb-2"
@@ -348,6 +413,28 @@ export default function SpecificationDetail({ specification, onBack }) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-60">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Confirmer la suppression</h3>
+            <p className="text-slate-600 mb-6">Êtes-vous sûr de vouloir supprimer cette fonctionnalité ? Cette action est irréversible.</p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteConfirm(null)}
+                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Supprimer
+              </button>
+            </div>
           </div>
         </div>
       )}

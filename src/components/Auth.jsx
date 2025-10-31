@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { LogIn, UserPlus, Loader2 } from 'lucide-react';
 
 export default function Auth() {
@@ -9,6 +10,7 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { signIn, signUp } = useAuth();
+  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +25,7 @@ export default function Auth() {
       setError(error.message);
     } else if (!isLogin) {
       setError('');
-      alert('Compte créé avec succès! Vous pouvez maintenant vous connecter.');
+      toast.addToast('Compte créé avec succès! Vous pouvez maintenant vous connecter.', { type: 'success' });
       setIsLogin(true);
     }
 

@@ -85,11 +85,15 @@ export const featuresAPI = {
     return await response.json();
   },
 
-  create: async (specificationId, title, description, orderIndex) => {
+  create: async (specificationId, title, description, orderIndex, level = 1, parentId = null) => {
+    const body = { title, description, orderIndex };
+    if (level !== undefined) body.level = level;
+    if (parentId !== undefined) body.parentId = parentId;
+
     const response = await fetch(`${API_URL}/specifications/${specificationId}/features`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ title, description, orderIndex }),
+      body: JSON.stringify(body),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Erreur lors de la création');

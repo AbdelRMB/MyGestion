@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { specificationsAPI, featuresAPI } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { FileText, Plus, LogOut, Loader2, Clock, CheckCircle2 } from 'lucide-react';
+import { useToast } from '../contexts/ToastContext';
 
 export default function SpecificationsList({ onSelectSpecification }) {
   const [specifications, setSpecifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { user, signOut } = useAuth();
+  const toast = useToast();
 
   useEffect(() => {
     loadSpecifications();
@@ -33,6 +35,7 @@ export default function SpecificationsList({ onSelectSpecification }) {
     } catch (error) {
       console.error('Erreur:', error);
       setSpecifications([]);
+      toast.addToast(error.message || 'Erreur lors du chargement', { type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -49,7 +52,7 @@ export default function SpecificationsList({ onSelectSpecification }) {
       setShowCreateModal(false);
       loadSpecifications();
     } catch (error) {
-      alert(error.message);
+      toast.addToast(error.message || 'Erreur lors de la création', { type: 'error' });
     }
   };
 
