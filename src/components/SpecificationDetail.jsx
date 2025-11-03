@@ -330,11 +330,13 @@ export default function SpecificationDetail() {
 
     return (
       <div className="relative mb-4">
-        {/* Lignes de connexion pour les sous-tâches */}
+        {/* Ligne de connexion depuis le parent (pour les sous-tâches) */}
         {level > 1 && (
           <>
-            <div className="absolute left-0 top-0 w-px h-8 bg-black -ml-8" />
-            <div className="absolute left-0 top-8 w-8 h-px bg-black -ml-8" />
+            {/* Ligne verticale qui descend du parent */}
+            <div className="absolute -left-6 -top-4 w-px h-8 bg-black" />
+            {/* Ligne horizontale vers la tâche */}
+            <div className="absolute -left-6 top-4 w-6 h-px bg-black" />
           </>
         )}
         
@@ -346,6 +348,10 @@ export default function SpecificationDetail() {
           }
           ${level === 1 ? 'ml-0' : 'ml-12'}
         `}>
+          {/* Ligne verticale qui continue vers le bas pour les enfants */}
+          {hasChildren(feature.id) && expandedForThis && (
+            <div className="absolute right-0 top-8 w-px h-full bg-black translate-x-6" />
+          )}
         {editingFeature === feature.id ? (
           <form onSubmit={(e) => handleUpdateFeature(feature.id, e)} className="p-2 sm:p-3">
             <input 
