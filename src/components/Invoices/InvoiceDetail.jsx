@@ -19,6 +19,7 @@ import {
   X,
   Check,
   XCircle,
+  FileText,
   FileCheck,
   DollarSign,
   CreditCard
