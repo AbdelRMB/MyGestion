@@ -19,7 +19,7 @@ import {
   X
 } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
-import QuotePDF from './QuotePDF';
+import QuotePDF from './QuotePDF.jsx';
 
 
 

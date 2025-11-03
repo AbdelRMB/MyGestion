@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';
-import Auth from './components/Auth';
-import Layout from './components/Layout/Layout';
-import Dashboard from './components/Dashboard/Dashboard';
-import SpecificationsList from './components/SpecificationsList';
-import SpecificationDetail from './components/SpecificationDetail';
-import QuotesList from './components/Quotes/QuotesList';
-import QuoteDetail from './components/Quotes/QuoteDetail';
+import { useAuth } from './contexts/AuthContext.jsx';
+import Auth from './components/Auth.jsx';
+import Layout from './components/Layout/Layout.jsx';
+import Dashboard from './components/Dashboard/Dashboard.jsx';
+import SpecificationsList from './components/SpecificationsList.jsx';
+import SpecificationDetail from './components/SpecificationDetail.jsx';
+import QuotesList from './components/Quotes/QuotesList.jsx';
+import QuoteDetail from './components/Quotes/QuoteDetail.jsx';
 import { Loader2 } from 'lucide-react';
 
 function App() {
