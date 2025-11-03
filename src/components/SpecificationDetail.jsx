@@ -132,8 +132,13 @@ export default function SpecificationDetail({ specification, onBack }) {
       
       // reconcile parents after a child changed - this will reload features internally
       await reconcileParentsFrom(feature.id);
+      
+      // Force reload all features to ensure UI is up to date
+      await loadFeatures();
     } catch (error) {
       toast.addToast(error.message || 'Erreur lors de la mise à jour', { type: 'error' });
+      // Reload features even on error to ensure UI consistency
+      await loadFeatures();
     }
   };
 
