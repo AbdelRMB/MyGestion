@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '../../contexts/ToastContext';
-import { quotesAPI } from '../../lib/api';
+import { quotesAPI, invoicesAPI } from '../../lib/api';
 import {
   ArrowLeft,
   Plus,
@@ -121,6 +121,19 @@ export default function QuoteDetail() {
       toast.addToast('Devis marqué comme accepté', { type: 'success' });
     } catch (error) {
       toast.addToast('Erreur lors de la mise à jour du statut', { type: 'error' });
+    }
+  };
+
+  const handleCreateInvoice = async () => {
+    try {
+      setSaving(true);
+      const newInvoice = await invoicesAPI.createFromQuote(quote.id);
+      toast.addToast('Facture créée avec succès', { type: 'success' });
+      navigate(`/invoices/${newInvoice.id}`);
+    } catch (error) {
+      toast.addToast('Erreur lors de la création de la facture', { type: 'error' });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -318,7 +331,27 @@ export default function QuoteDetail() {
                   </>
                 )}
 
-                {(quote.status === 'accepted' || quote.status === 'rejected' || quote.status === 'expired') && (
+                {quote.status === 'accepted' && (
+                  <>
+                    <button 
+                      onClick={exportToPDF}
+                      className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                      Télécharger PDF
+                    </button>
+                    <button 
+                      onClick={handleCreateInvoice}
+                      disabled={saving}
+                      className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                    >
+                      <Plus className="w-4 h-4" />
+                      {saving ? 'Création...' : 'Créer une Facture'}
+                    </button>
+                  </>
+                )}
+
+                {(quote.status === 'rejected' || quote.status === 'expired') && (
                   <button 
                     onClick={exportToPDF}
                     className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"

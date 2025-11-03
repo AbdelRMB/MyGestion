@@ -7,6 +7,8 @@ import SpecificationsList from './components/SpecificationsList.jsx';
 import SpecificationDetail from './components/SpecificationDetail.jsx';
 import QuotesList from './components/Quotes/QuotesList.jsx';
 import QuoteDetail from './components/Quotes/QuoteDetail.jsx';
+import InvoicesList from './components/Invoices/InvoicesList.jsx';
+import InvoiceDetail from './components/Invoices/InvoiceDetail.jsx';
 import { Loader2 } from 'lucide-react';
 
 function App() {
@@ -35,6 +37,9 @@ function App() {
           <Route path="quotes" element={<QuotesList />} />
           <Route path="quotes/:id" element={<QuoteDetail />} />
           <Route path="quotes/:id/edit" element={<QuoteDetail />} />
+          <Route path="invoices" element={<InvoicesList />} />
+          <Route path="invoices/:id" element={<InvoiceDetail />} />
+          <Route path="invoices/:id/edit" element={<InvoiceDetail />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

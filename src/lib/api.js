@@ -268,3 +268,134 @@ export const quotesAPI = {
     });
   }
 };
+
+export const invoicesAPI = {
+  getAll: async (params = {}) => {
+    const searchParams = new URLSearchParams();
+    
+    if (params.page) searchParams.append('page', params.page);
+    if (params.limit) searchParams.append('limit', params.limit);
+    if (params.status && params.status !== 'all') searchParams.append('status', params.status);
+    if (params.search) searchParams.append('search', params.search);
+
+    const url = `${API_URL}/invoices${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    
+    const response = await fetch(url, {
+      headers: getAuthHeaders(),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors du chargement des factures');
+    
+    return data;
+  },
+
+  getById: async (id) => {
+    const response = await fetch(`${API_URL}/invoices/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors du chargement de la facture');
+    
+    return data;
+  },
+
+  create: async (invoiceData) => {
+    const response = await fetch(`${API_URL}/invoices`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(invoiceData),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la création de la facture');
+    
+    return data;
+  },
+
+  createFromQuote: async (quoteId) => {
+    const response = await fetch(`${API_URL}/invoices/from-quote/${quoteId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la création de la facture à partir du devis');
+    
+    return data;
+  },
+
+  update: async (id, invoiceData) => {
+    const response = await fetch(`${API_URL}/invoices/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(invoiceData),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la mise à jour de la facture');
+    
+    return data;
+  },
+
+  delete: async (id) => {
+    const response = await fetch(`${API_URL}/invoices/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Erreur lors de la suppression de la facture');
+    }
+  },
+
+  updateStatus: async (id, status) => {
+    const response = await fetch(`${API_URL}/invoices/${id}/status`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ status }),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la mise à jour du statut');
+    
+    return data;
+  },
+
+  recordPayment: async (id, paymentData) => {
+    const response = await fetch(`${API_URL}/invoices/${id}/payment`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(paymentData),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de l\'enregistrement du paiement');
+    
+    return data;
+  },
+
+  duplicate: async (id) => {
+    const response = await fetch(`${API_URL}/invoices/${id}/duplicate`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la duplication de la facture');
+    
+    return data;
+  },
+
+  sendByEmail: async (id) => {
+    // Pour le moment, on simule l'envoi par email
+    // Dans une vraie application, ceci ferait appel à un service d'email
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ success: true, message: 'Facture envoyée par email' });
+      }, 1000);
+    });
+  }
+};

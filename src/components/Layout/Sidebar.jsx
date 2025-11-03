@@ -8,7 +8,8 @@ import {
   ChevronRight,
   LogOut,
   User,
-  Euro
+  Euro,
+  Receipt
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -30,6 +31,12 @@ const menuItems = [
     label: 'Devis',
     icon: Euro,
     path: '/quotes',
+  },
+  {
+    id: 'invoices',
+    label: 'Factures',
+    icon: Receipt,
+    path: '/invoices',
   },
   // Modules futurs à ajouter ici
 ];

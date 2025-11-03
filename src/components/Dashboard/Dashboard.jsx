@@ -6,7 +6,9 @@ import {
   CheckCircle,
   AlertCircle,
   BarChart3,
-  Calendar
+  Calendar,
+  Euro,
+  Receipt
 } from 'lucide-react';
 
 const stats = [
@@ -19,24 +21,24 @@ const stats = [
     color: 'blue'
   },
   {
-    title: 'Tâches complétées',
-    value: '89',
-    change: '+12',
+    title: 'Devis actifs',
+    value: '8',
+    change: '+3',
     changeType: 'positive',
-    icon: CheckCircle,
+    icon: Euro,
+    color: 'indigo'
+  },
+  {
+    title: 'Factures payées',
+    value: '24',
+    change: '+6',
+    changeType: 'positive',
+    icon: Receipt,
     color: 'green'
   },
   {
-    title: 'En cours',
-    value: '34',
-    change: '+5',
-    changeType: 'positive',
-    icon: Clock,
-    color: 'orange'
-  },
-  {
     title: 'En retard',
-    value: '3',
+    value: '2',
     change: '-1',
     changeType: 'negative',
     icon: AlertCircle,
@@ -47,27 +49,33 @@ const stats = [
 const recentActivities = [
   {
     id: 1,
-    title: 'Cahier des charges "Application Mobile" créé',
-    time: 'Il y a 2 heures',
-    type: 'creation'
+    title: 'Devis "Site Web Corporate" accepté',
+    time: 'Il y a 30 minutes',
+    type: 'quote-accepted'
   },
   {
     id: 2,
-    title: 'Tâche "Interface utilisateur" complétée',
-    time: 'Il y a 4 heures',
-    type: 'completion'
+    title: 'Facture FAC-2024-001 payée (2,400€)',
+    time: 'Il y a 2 heures',
+    type: 'payment'
   },
   {
     id: 3,
-    title: 'Révision du cahier "Site Web E-commerce"',
-    time: 'Il y a 1 jour',
-    type: 'update'
+    title: 'Nouveau devis "App Mobile" créé',
+    time: 'Il y a 4 heures',
+    type: 'quote-created'
   },
   {
     id: 4,
-    title: 'Nouveau cahier des charges assigné',
+    title: 'Facture FAC-2024-002 envoyée',
+    time: 'Il y a 1 jour',
+    type: 'invoice-sent'
+  },
+  {
+    id: 5,
+    title: 'Cahier des charges "E-commerce" complété',
     time: 'Il y a 2 jours',
-    type: 'assignment'
+    type: 'spec-completed'
   }
 ];
 
