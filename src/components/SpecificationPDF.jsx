@@ -17,27 +17,26 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#6B7280',
+    borderBottomColor: '#000000',
   },
   
   documentTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#000000',
     marginBottom: 8,
-    letterSpacing: 2,
   },
   
   projectTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#374151',
+    fontWeight: 'normal',
+    color: '#000000',
     marginBottom: 8,
   },
   
   projectDescription: {
     fontSize: 12,
-    color: '#64748B',
+    color: '#000000',
     marginBottom: 8,
     maxWidth: '80%',
     alignSelf: 'center',
@@ -45,7 +44,7 @@ const styles = StyleSheet.create({
   
   documentDate: {
     fontSize: 10,
-    color: '#64748B',
+    color: '#000000',
     marginTop: 8,
   },
 
@@ -53,13 +52,12 @@ const styles = StyleSheet.create({
   tocTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#000000',
     marginBottom: 20,
     marginTop: 30,
     paddingBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#6B7280',
-    letterSpacing: 1,
+    borderBottomColor: '#000000',
   },
   
   tocSection: {
@@ -79,8 +77,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#E5E7EB',
   },
   
   tocItemLevel2: {
@@ -95,13 +91,13 @@ const styles = StyleSheet.create({
   },
   
   tocLink: {
-    color: '#374151',
+    color: '#000000',
     textDecoration: 'none',
     cursor: 'pointer',
   },
   
   tocLinkLevel2: {
-    color: '#6B7280',
+    color: '#000000',
     textDecoration: 'none',
     cursor: 'pointer',
   },
@@ -121,60 +117,41 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#000000',
     marginTop: 30,
     marginBottom: 12,
     paddingBottom: 6,
     borderBottomWidth: 1,
-    borderBottomColor: '#6B7280',
-    flexDirection: 'row',
-    alignItems: 'center',
+    borderBottomColor: '#000000',
   },
   
   sectionNumber: {
-    backgroundColor: '#1F2937',
-    color: 'white',
-    padding: 6,
+    color: '#000000',
     marginRight: 10,
     fontSize: 14,
     fontWeight: 'bold',
-    minWidth: 30,
-    textAlign: 'center',
   },
   
   subsectionTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#374151',
+    color: '#000000',
     marginTop: 20,
     marginBottom: 8,
-    paddingBottom: 4,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#9CA3AF',
-    flexDirection: 'row',
-    alignItems: 'center',
     marginLeft: 15,
   },
   
   subsectionNumber: {
-    backgroundColor: '#4B5563',
-    color: 'white',
-    padding: 4,
+    color: '#000000',
     marginRight: 8,
     fontSize: 11,
     fontWeight: 'bold',
-    minWidth: 25,
-    textAlign: 'center',
   },
   
   description: {
     fontSize: 11,
-    color: '#374151',
+    color: '#000000',
     marginBottom: 12,
-    backgroundColor: '#F9FAFB',
-    padding: 12,
-    borderLeftWidth: 2,
-    borderLeftColor: '#6B7280',
     lineHeight: 1.5,
   },
   
