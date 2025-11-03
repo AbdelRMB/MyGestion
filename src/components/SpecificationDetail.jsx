@@ -329,14 +329,23 @@ export default function SpecificationDetail() {
     };
 
     return (
-      <div className={`
-        relative rounded-lg sm:rounded-xl shadow-sm border transition-all duration-200 ease-in-out
-        ${feature.isCompleted 
-          ? 'border-green-300 bg-gradient-to-r from-green-50/70 to-emerald-50/70' 
-          : `${levelColors[level] || levelColors[3]} hover:shadow-md`
-        }
-        ${level > 1 ? 'ml-2 sm:ml-4 mt-1 sm:mt-2' : 'mb-2 sm:mb-3'}
-      `}>
+      <div className="relative mb-4">
+        {/* Lignes de connexion pour les sous-tâches */}
+        {level > 1 && (
+          <>
+            <div className="absolute left-0 top-0 w-px h-8 bg-black -ml-8" />
+            <div className="absolute left-0 top-8 w-8 h-px bg-black -ml-8" />
+          </>
+        )}
+        
+        <div className={`
+          relative rounded border transition-all duration-200 ease-in-out min-h-16
+          ${feature.isCompleted 
+            ? 'border-green-300 bg-gradient-to-r from-green-50/70 to-emerald-50/70' 
+            : `${levelColors[level] || levelColors[3]} hover:shadow-md`
+          }
+          ${level === 1 ? 'ml-0' : 'ml-12'}
+        `}>
         {editingFeature === feature.id ? (
           <form onSubmit={(e) => handleUpdateFeature(feature.id, e)} className="p-2 sm:p-3">
             <input 
@@ -484,7 +493,7 @@ export default function SpecificationDetail() {
             
             {/* Render children directly below when expanded */}
             {hasChildren(feature.id) && expandedForThis && (
-              <div className="mt-4 space-y-1">
+              <div className="mt-4 space-y-1 relative">
                 {children.map((child, idx) => (
                   <FeatureItem key={child.id} feature={child} level={level + 1} index={idx} />
                 ))}
@@ -492,6 +501,7 @@ export default function SpecificationDetail() {
             )}
           </div>
         )}
+        </div>
       </div>
     );
   }
