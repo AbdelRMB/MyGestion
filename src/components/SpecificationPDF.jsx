@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Link } from '@react-pdf/renderer';
 
 // Styles pour le PDF du cahier des charges
 const styles = StyleSheet.create({
@@ -91,6 +91,18 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   
+  tocLink: {
+    color: '#2563EB',
+    textDecoration: 'none',
+    cursor: 'pointer',
+  },
+  
+  tocLinkLevel2: {
+    color: '#7C3AED',
+    textDecoration: 'none',
+    cursor: 'pointer',
+  },
+  
   tocDots: {
     flex: 2,
     textAlign: 'center',
@@ -101,14 +113,13 @@ const styles = StyleSheet.create({
   // Contenu principal
   contentSection: {
     marginTop: 30,
-    pageBreakBefore: 'always',
   },
   
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#1E293B',
-    marginTop: 25,
+    marginTop: 30,
     marginBottom: 12,
     paddingBottom: 6,
     borderBottomWidth: 2,
@@ -273,9 +284,11 @@ const SpecificationPDF = ({ specification, features, generateTableOfContents, ge
               <View key={item.id}>
                 {/* Niveau 1 */}
                 <View style={[styles.tocItem, styles.tocItemLevel1]}>
-                  <Text style={styles.tocItemText}>
-                    {item.index}. {item.title}
-                  </Text>
+                  <Link src={`#section-${item.id}`} style={[styles.tocItemText, styles.tocLink]}>
+                    <Text>
+                      {item.index}. {item.title}
+                    </Text>
+                  </Link>
                   <Text style={styles.tocDots}>
                     {item.children.length > 0 ? '························' : '- - - - - - - - - -'}
                   </Text>
@@ -284,9 +297,11 @@ const SpecificationPDF = ({ specification, features, generateTableOfContents, ge
                 {/* Niveau 2 */}
                 {item.children.map((child) => (
                   <View key={child.id} style={[styles.tocItem, styles.tocItemLevel2]}>
-                    <Text style={styles.tocItemText}>
-                      {child.index} {child.title}
-                    </Text>
+                    <Link src={`#section-${child.id}`} style={[styles.tocItemText, styles.tocLinkLevel2]}>
+                      <Text>
+                        {child.index} {child.title}
+                      </Text>
+                    </Link>
                     <Text style={styles.tocDots}>- - - - - - - - -</Text>
                   </View>
                 ))}
@@ -310,41 +325,63 @@ const SpecificationPDF = ({ specification, features, generateTableOfContents, ge
         </Text>
       </Page>
 
-      {/* Pages de contenu */}
-      {tableOfContents.length > 0 && tableOfContents.map((item, sectionIndex) => (
-        <Page key={`content-${item.id}`} size="A4" style={styles.page}>
-          {/* Section Niveau 1 */}
-          <View style={styles.sectionTitle}>
-            <Text style={styles.sectionNumber}>{item.index}</Text>
-            <Text style={{ flex: 1 }}>{item.title}</Text>
-          </View>
-          
-          {item.description && (
-            <Text style={styles.description}>{item.description}</Text>
-          )}
-
-          {/* Sous-sections Niveau 2 */}
-          {item.children.map((child) => (
-            <View key={child.id}>
-              <View style={styles.subsectionTitle}>
-                <Text style={styles.subsectionNumber}>{child.index}</Text>
-                <Text style={{ flex: 1 }}>{child.title}</Text>
+      {/* Page de contenu */}
+      {tableOfContents.length > 0 && (
+        <Page size="A4" style={styles.page}>
+          {/* Contenu continu */}
+          {tableOfContents.map((item, sectionIndex) => (
+            <View key={`content-${item.id}`}>
+              {/* Section Niveau 1 */}
+              <View style={styles.sectionTitle} id={`section-${item.id}`}>
+                <Text style={styles.sectionNumber}>{item.index}</Text>
+                <Text style={{ flex: 1 }}>{item.title}</Text>
               </View>
               
-              {child.description && (
-                <Text style={styles.subsectionDescription}>{child.description}</Text>
+              {item.description && (
+                <Text style={styles.description}>{item.description}</Text>
               )}
 
-              {/* Éléments Niveau 3 */}
-              {child.children && child.children.length > 0 && (
+              {/* Sous-sections Niveau 2 */}
+              {item.children.map((child) => (
+                <View key={child.id}>
+                  <View style={styles.subsectionTitle} id={`section-${child.id}`}>
+                    <Text style={styles.subsectionNumber}>{child.index}</Text>
+                    <Text style={{ flex: 1 }}>{child.title}</Text>
+                  </View>
+                  
+                  {child.description && (
+                    <Text style={styles.subsectionDescription}>{child.description}</Text>
+                  )}
+
+                  {/* Éléments Niveau 3 */}
+                  {child.children && child.children.length > 0 && (
+                    <View style={styles.bulletList}>
+                      {child.children.map((grandChild) => (
+                        <View key={grandChild.id} style={styles.bulletItem}>
+                          <View style={styles.bulletPoint} />
+                          <View style={{ flex: 1 }}>
+                            <Text style={styles.bulletTitle}>{grandChild.title}</Text>
+                            {grandChild.description && (
+                              <Text style={styles.bulletText}>{grandChild.description}</Text>
+                            )}
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              ))}
+
+              {/* Si pas d'enfants niveau 2, afficher directement les niveau 3 */}
+              {item.children.length === 0 && getChildren(item.id).length > 0 && (
                 <View style={styles.bulletList}>
-                  {child.children.map((grandChild) => (
-                    <View key={grandChild.id} style={styles.bulletItem}>
+                  {getChildren(item.id).map((child) => (
+                    <View key={child.id} style={styles.bulletItem}>
                       <View style={styles.bulletPoint} />
                       <View style={{ flex: 1 }}>
-                        <Text style={styles.bulletTitle}>{grandChild.title}</Text>
-                        {grandChild.description && (
-                          <Text style={styles.bulletText}>{grandChild.description}</Text>
+                        <Text style={styles.bulletTitle}>{child.title}</Text>
+                        {child.description && (
+                          <Text style={styles.bulletText}>{child.description}</Text>
                         )}
                       </View>
                     </View>
@@ -354,32 +391,15 @@ const SpecificationPDF = ({ specification, features, generateTableOfContents, ge
             </View>
           ))}
 
-          {/* Si pas d'enfants niveau 2, afficher directement les niveau 3 */}
-          {item.children.length === 0 && getChildren(item.id).length > 0 && (
-            <View style={styles.bulletList}>
-              {getChildren(item.id).map((child) => (
-                <View key={child.id} style={styles.bulletItem}>
-                  <View style={styles.bulletPoint} />
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.bulletTitle}>{child.title}</Text>
-                    {child.description && (
-                      <Text style={styles.bulletText}>{child.description}</Text>
-                    )}
-                  </View>
-                </View>
-              ))}
-            </View>
-          )}
-
           {/* Footer */}
           <Text style={styles.footer}>
             {specification.title} - Cahier des charges
           </Text>
           <Text style={styles.pageNumber}>
-            Page {sectionIndex + 2}
+            Page 2
           </Text>
         </Page>
-      ))}
+      )}
     </Document>
   );
 };
