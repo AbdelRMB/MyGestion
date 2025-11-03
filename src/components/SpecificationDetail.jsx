@@ -230,7 +230,7 @@ export default function SpecificationDetail({ specification, onBack }) {
     ? Math.round((completedCount / features.length) * 100)
     : 0;
 
-  // Fonction pour générer la table des matières
+  // Fonction pour générer la table des matières (niveaux 1 et 2 uniquement)
   const generateTableOfContents = () => {
     const level1Features = levelList(1);
     
@@ -241,19 +241,11 @@ export default function SpecificationDetail({ specification, onBack }) {
       return {
         ...feature,
         index: index + 1,
-        children: hasLevel2Children ? children.map((child, childIndex) => {
-          const grandChildren = getChildren(child.id);
-          const hasLevel3Children = grandChildren.length > 0;
-          
-          return {
-            ...child,
-            index: `${index + 1}.${childIndex + 1}`,
-            children: hasLevel3Children ? grandChildren.map((grandChild, grandChildIndex) => ({
-              ...grandChild,
-              index: `${index + 1}.${childIndex + 1}.${grandChildIndex + 1}`,
-            })) : []
-          };
-        }) : []
+        children: hasLevel2Children ? children.map((child, childIndex) => ({
+          ...child,
+          index: `${index + 1}.${childIndex + 1}`,
+          children: getChildren(child.id) // On garde les enfants niveau 3 pour le contenu mais pas pour la table des matières
+        })) : []
       };
     });
   };
@@ -571,9 +563,12 @@ export default function SpecificationDetail({ specification, onBack }) {
                       <div key={item.id}>
                         {/* Niveau 1 */}
                         <div className="flex justify-between items-center py-2 border-b border-dotted border-slate-200">
-                          <span className="font-semibold text-slate-900">
+                          <button
+                            onClick={() => document.getElementById(`section-${item.id}`)?.scrollIntoView({ behavior: 'smooth' })}
+                            className="font-semibold text-slate-900 hover:text-blue-600 transition-colors cursor-pointer text-left"
+                          >
                             {item.index}. {item.title}
-                          </span>
+                          </button>
                           <span className="text-slate-400">
                             {item.children.length > 0 ? '.....................' : '- - - - - - - - - -'}
                           </span>
@@ -581,30 +576,108 @@ export default function SpecificationDetail({ specification, onBack }) {
                         
                         {/* Niveau 2 */}
                         {item.children.map((child) => (
-                          <div key={child.id}>
-                            <div className="flex justify-between items-center py-1 ml-6 text-sm border-b border-dotted border-slate-100">
-                              <span className="text-slate-700">
-                                {child.index} {child.title}
-                              </span>
-                              <span className="text-slate-300">
-                                {child.children.length > 0 ? '................' : '- - - - - - -'}
-                              </span>
-                            </div>
-                            
-                            {/* Niveau 3 */}
-                            {child.children.map((grandChild) => (
-                              <div key={grandChild.id} className="flex justify-between items-center py-1 ml-12 text-sm text-slate-600">
-                                <span>
-                                  {grandChild.index} {grandChild.title}
-                                </span>
-                                <span className="text-slate-300">- - - - -</span>
-                              </div>
-                            ))}
+                          <div key={child.id} className="flex justify-between items-center py-1 ml-6 text-sm border-b border-dotted border-slate-100">
+                            <button
+                              onClick={() => document.getElementById(`section-${child.id}`)?.scrollIntoView({ behavior: 'smooth' })}
+                              className="text-slate-700 hover:text-blue-600 transition-colors cursor-pointer text-left"
+                            >
+                              {child.index} {child.title}
+                            </button>
+                            <span className="text-slate-300">- - - - - - -</span>
                           </div>
                         ))}
                       </div>
                     ))}
                   </div>
+                </div>
+
+                {/* Contenu du document */}
+                <div className="space-y-8">
+                  {generateTableOfContents().map((item) => (
+                    <div key={item.id}>
+                      {/* Section Niveau 1 */}
+                      <div id={`section-${item.id}`} className="scroll-mt-24">
+                        <h2 className="text-2xl font-bold text-slate-900 mb-4 border-b-2 border-blue-600 pb-2 flex items-center gap-3">
+                          <span className="bg-blue-600 text-white px-3 py-1 rounded-lg text-lg">
+                            {item.index}
+                          </span>
+                          {item.title}
+                        </h2>
+                        {item.description && (
+                          <p className="text-slate-700 mb-6 leading-relaxed bg-slate-50 p-4 rounded-lg border-l-4 border-blue-600">
+                            {item.description}
+                          </p>
+                        )}
+
+                        {/* Sous-sections Niveau 2 */}
+                        {item.children.length > 0 && (
+                          <div className="ml-4 space-y-6">
+                            {item.children.map((child) => (
+                              <div key={child.id} id={`section-${child.id}`} className="scroll-mt-24">
+                                <h3 className="text-xl font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                                  <span className="bg-purple-600 text-white px-2 py-1 rounded text-sm">
+                                    {child.index}
+                                  </span>
+                                  {child.title}
+                                </h3>
+                                {child.description && (
+                                  <p className="text-slate-600 mb-4 leading-relaxed bg-purple-50 p-3 rounded border-l-4 border-purple-600">
+                                    {child.description}
+                                  </p>
+                                )}
+
+                                {/* Éléments Niveau 3 */}
+                                {child.children.length > 0 && (
+                                  <div className="ml-4 space-y-3">
+                                    {child.children.map((grandChild, idx) => (
+                                      <div key={grandChild.id} className="flex items-start gap-3">
+                                        <span className="flex-shrink-0 w-6 h-6 bg-emerald-600 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">
+                                          •
+                                        </span>
+                                        <div className="flex-1">
+                                          <h4 className="font-medium text-slate-700 mb-1">
+                                            {grandChild.title}
+                                          </h4>
+                                          {grandChild.description && (
+                                            <p className="text-slate-600 text-sm leading-relaxed">
+                                              {grandChild.description}
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Si pas d'enfants niveau 2, afficher directement les niveau 3 s'il y en a */}
+                        {item.children.length === 0 && getChildren(item.id).length > 0 && (
+                          <div className="ml-4 space-y-3">
+                            {getChildren(item.id).map((child) => (
+                              <div key={child.id} className="flex items-start gap-3">
+                                <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">
+                                  •
+                                </span>
+                                <div className="flex-1">
+                                  <h4 className="font-medium text-slate-700 mb-1">
+                                    {child.title}
+                                  </h4>
+                                  {child.description && (
+                                    <p className="text-slate-600 text-sm leading-relaxed">
+                                      {child.description}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </>
             )}
