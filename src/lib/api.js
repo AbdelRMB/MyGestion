@@ -399,3 +399,134 @@ export const invoicesAPI = {
     });
   }
 };
+
+export const contractsAPI = {
+  getAll: async (params = {}) => {
+    const searchParams = new URLSearchParams();
+    
+    if (params.page) searchParams.append('page', params.page);
+    if (params.limit) searchParams.append('limit', params.limit);
+    if (params.status && params.status !== 'all') searchParams.append('status', params.status);
+    if (params.search) searchParams.append('search', params.search);
+
+    const url = `${API_URL}/contracts${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    
+    const response = await fetch(url, {
+      headers: getAuthHeaders(),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors du chargement des contrats');
+    
+    return data;
+  },
+
+  getById: async (id) => {
+    const response = await fetch(`${API_URL}/contracts/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors du chargement du contrat');
+    
+    return data;
+  },
+
+  create: async (contractData) => {
+    const response = await fetch(`${API_URL}/contracts`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(contractData),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la création du contrat');
+    
+    return data;
+  },
+
+  createFromQuote: async (quoteId) => {
+    const response = await fetch(`${API_URL}/contracts/from-quote/${quoteId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la création du contrat à partir du devis');
+    
+    return data;
+  },
+
+  update: async (id, contractData) => {
+    const response = await fetch(`${API_URL}/contracts/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(contractData),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la mise à jour du contrat');
+    
+    return data;
+  },
+
+  delete: async (id) => {
+    const response = await fetch(`${API_URL}/contracts/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Erreur lors de la suppression du contrat');
+    }
+  },
+
+  updateStatus: async (id, status) => {
+    const response = await fetch(`${API_URL}/contracts/${id}/status`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ status }),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la mise à jour du statut');
+    
+    return data;
+  },
+
+  updateMilestone: async (contractId, milestoneId, milestoneData) => {
+    const response = await fetch(`${API_URL}/contracts/${contractId}/milestones/${milestoneId}`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(milestoneData),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la mise à jour du jalon');
+    
+    return data;
+  },
+
+  duplicate: async (id) => {
+    const response = await fetch(`${API_URL}/contracts/${id}/duplicate`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la duplication du contrat');
+    
+    return data;
+  },
+
+  sendByEmail: async (id) => {
+    // Pour le moment, on simule l'envoi par email
+    // Dans une vraie application, ceci ferait appel à un service d'email
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ success: true, message: 'Contrat envoyé par email' });
+      }, 1000);
+    });
+  }
+};

@@ -8,7 +8,8 @@ import {
   BarChart3,
   Calendar,
   Euro,
-  Receipt
+  Receipt,
+  FileCheck
 } from 'lucide-react';
 
 const stats = [
@@ -29,53 +30,53 @@ const stats = [
     color: 'indigo'
   },
   {
+    title: 'Contrats actifs',
+    value: '5',
+    change: '+2',
+    changeType: 'positive',
+    icon: FileCheck,
+    color: 'purple'
+  },
+  {
     title: 'Factures payées',
     value: '24',
     change: '+6',
     changeType: 'positive',
     icon: Receipt,
     color: 'green'
-  },
-  {
-    title: 'En retard',
-    value: '2',
-    change: '-1',
-    changeType: 'negative',
-    icon: AlertCircle,
-    color: 'red'
   }
 ];
 
 const recentActivities = [
   {
     id: 1,
+    title: 'Contrat CNT-2025-001 signé (15,000€)',
+    time: 'Il y a 15 minutes',
+    type: 'contract-signed'
+  },
+  {
+    id: 2,
     title: 'Devis "Site Web Corporate" accepté',
     time: 'Il y a 30 minutes',
     type: 'quote-accepted'
   },
   {
-    id: 2,
+    id: 3,
     title: 'Facture FAC-2024-001 payée (2,400€)',
     time: 'Il y a 2 heures',
     type: 'payment'
   },
   {
-    id: 3,
-    title: 'Nouveau devis "App Mobile" créé',
-    time: 'Il y a 4 heures',
-    type: 'quote-created'
-  },
-  {
     id: 4,
-    title: 'Facture FAC-2024-002 envoyée',
-    time: 'Il y a 1 jour',
-    type: 'invoice-sent'
+    title: 'Nouveau contrat de maintenance créé',
+    time: 'Il y a 4 heures',
+    type: 'contract-created'
   },
   {
     id: 5,
-    title: 'Cahier des charges "E-commerce" complété',
-    time: 'Il y a 2 jours',
-    type: 'spec-completed'
+    title: 'Jalon "Phase 1" terminé sur CNT-2025-001',
+    time: 'Il y a 1 jour',
+    type: 'milestone-completed'
   }
 ];
 

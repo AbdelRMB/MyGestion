@@ -9,7 +9,8 @@ import {
   LogOut,
   User,
   Euro,
-  Receipt
+  Receipt,
+  FileCheck
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -37,6 +38,12 @@ const menuItems = [
     label: 'Factures',
     icon: Receipt,
     path: '/invoices',
+  },
+  {
+    id: 'contracts',
+    label: 'Contrats',
+    icon: FileCheck,
+    path: '/contracts',
   },
   // Modules futurs à ajouter ici
 ];

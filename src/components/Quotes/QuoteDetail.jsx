@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '../../contexts/ToastContext';
-import { quotesAPI, invoicesAPI } from '../../lib/api';
+import { quotesAPI, invoicesAPI, contractsAPI } from '../../lib/api';
 import {
   ArrowLeft,
   Plus,
@@ -132,6 +132,19 @@ export default function QuoteDetail() {
       navigate(`/invoices/${newInvoice.id}`);
     } catch (error) {
       toast.addToast('Erreur lors de la création de la facture', { type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCreateContract = async () => {
+    try {
+      setSaving(true);
+      const newContract = await contractsAPI.createFromQuote(quote.id);
+      toast.addToast('Contrat créé avec succès', { type: 'success' });
+      navigate(`/contracts/${newContract.id}`);
+    } catch (error) {
+      toast.addToast('Erreur lors de la création du contrat', { type: 'error' });
     } finally {
       setSaving(false);
     }
@@ -347,6 +360,14 @@ export default function QuoteDetail() {
                     >
                       <Plus className="w-4 h-4" />
                       {saving ? 'Création...' : 'Créer une Facture'}
+                    </button>
+                    <button 
+                      onClick={handleCreateContract}
+                      disabled={saving}
+                      className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                    >
+                      <FileCheck className="w-4 h-4" />
+                      {saving ? 'Création...' : 'Créer un Contrat'}
                     </button>
                   </>
                 )}
