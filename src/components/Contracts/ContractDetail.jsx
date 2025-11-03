@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '../../contexts/ToastContext';
+import { contractsAPI } from '../../lib/api';
 import { 
   ArrowLeft,
   Plus,
@@ -69,95 +70,9 @@ const ContractDetail = () => {
         });
         setEditMode(true);
       } else {
-        // Charger un contrat existant - pour le moment utilisons des données simulées
-        const mockContract = {
-          id: 1,
-          contract_number: 'CNT-2025-001',
-          title: 'Contrat de développement Site Web',
-          client_name: 'SARL TechnoServices',
-          client_email: 'contact@technoservices.fr',
-          client_phone: '+33 1 23 45 67 89',
-          client_address: '123 Rue de la Tech\n75001 Paris',
-          status: 'active',
-          start_date: '2025-01-15',
-          end_date: '2025-12-15',
-          signature_date: '2025-01-10',
-          contract_value: 15000.00,
-          contract_type: 'development',
-          payment_schedule: 'monthly',
-          auto_renew: false,
-          renewal_period: 12,
-          termination_notice: 30,
-          notes: 'Contrat pour le développement d\'un site web e-commerce complet.',
-          terms_and_conditions: 'Conditions générales de vente applicables.',
-          created_at: '2025-01-10T10:00:00Z',
-          clauses: [
-            {
-              id: 1,
-              clause_title: 'Objet du contrat',
-              clause_content: 'Le présent contrat a pour objet la réalisation d\'un site web e-commerce.',
-              clause_type: 'general',
-              is_mandatory: true,
-              position: 0
-            },
-            {
-              id: 2,
-              clause_title: 'Conditions de paiement',
-              clause_content: 'Le paiement s\'effectuera mensuellement selon l\'avancement des travaux.',
-              clause_type: 'payment',
-              is_mandatory: true,
-              position: 1
-            }
-          ],
-          milestones: [
-            {
-              id: 1,
-              milestone_title: 'Conception et maquettes',
-              milestone_description: 'Réalisation des maquettes et validation du design',
-              due_date: '2025-02-15',
-              amount: 3750.00,
-              status: 'completed',
-              completion_date: '2025-02-10',
-              payment_date: '2025-02-12',
-              position: 0
-            },
-            {
-              id: 2,
-              milestone_title: 'Développement frontend',
-              milestone_description: 'Développement de l\'interface utilisateur',
-              due_date: '2025-04-15',
-              amount: 3750.00,
-              status: 'completed',
-              completion_date: '2025-04-10',
-              payment_date: '2025-04-12',
-              position: 1
-            },
-            {
-              id: 3,
-              milestone_title: 'Développement backend',
-              milestone_description: 'Développement de l\'API et base de données',
-              due_date: '2025-06-15',
-              amount: 3750.00,
-              status: 'pending',
-              completion_date: null,
-              payment_date: null,
-              position: 2
-            },
-            {
-              id: 4,
-              milestone_title: 'Tests et mise en ligne',
-              milestone_description: 'Tests complets et déploiement',
-              due_date: '2025-08-15',
-              amount: 3750.00,
-              status: 'pending',
-              completion_date: null,
-              payment_date: null,
-              position: 3
-            }
-          ]
-        };
-        
-        setContract(mockContract);
+        // Charger un contrat existant
+        const contractData = await contractsAPI.getById(id);
+        setContract(contractData);
       }
     } catch (error) {
       toast.addToast('Erreur lors du chargement du contrat', { type: 'error' });
@@ -173,14 +88,13 @@ const ContractDetail = () => {
       
       if (contract.id) {
         // Mise à jour
-        // await contractsAPI.update(contract.id, contract);
+        await contractsAPI.update(contract.id, contract);
         toast.addToast('Contrat mis à jour avec succès', { type: 'success' });
       } else {
         // Création
-        // const newContract = await contractsAPI.create(contract);
+        const newContract = await contractsAPI.create(contract);
         toast.addToast('Contrat créé avec succès', { type: 'success' });
-        // navigate(`/contracts/${newContract.id}`);
-        navigate('/contracts');
+        navigate(`/contracts/${newContract.id}`);
       }
       
       setEditMode(false);
@@ -193,7 +107,7 @@ const ContractDetail = () => {
 
   const handleStatusUpdate = async (newStatus) => {
     try {
-      // await contractsAPI.updateStatus(contract.id, newStatus);
+      await contractsAPI.updateStatus(contract.id, newStatus);
       setContract(prev => ({ ...prev, status: newStatus }));
       toast.addToast('Statut mis à jour avec succès', { type: 'success' });
     } catch (error) {
@@ -203,7 +117,7 @@ const ContractDetail = () => {
 
   const handleMilestoneUpdate = async (milestoneId, updates) => {
     try {
-      // await contractsAPI.updateMilestone(contract.id, milestoneId, updates);
+      await contractsAPI.updateMilestone(contract.id, milestoneId, updates);
       setContract(prev => ({
         ...prev,
         milestones: prev.milestones.map(m => 

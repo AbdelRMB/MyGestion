@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
+import { contractsAPI } from '../../lib/api';
 import { 
   FileText, 
   Plus, 
@@ -40,88 +41,16 @@ const ContractsList = () => {
   const loadContracts = async () => {
     try {
       setLoading(true);
-      // const response = await contractsAPI.getAll({
-      //   page: currentPage,
-      //   limit: 10,
-      //   search: searchTerm,
-      //   status: statusFilter
-      // });
+      const response = await contractsAPI.getAll({
+        page: currentPage,
+        limit: 10,
+        search: searchTerm,
+        status: statusFilter
+      });
       
-      // Pour le moment, utilisons des données simulées
-      const mockData = {
-        contracts: [
-          {
-            id: 1,
-            contract_number: 'CNT-2025-001',
-            title: 'Contrat de développement Site Web',
-            client_name: 'SARL TechnoServices',
-            status: 'active',
-            start_date: '2025-01-15',
-            end_date: '2025-12-15',
-            contract_value: 15000.00,
-            contract_type: 'development',
-            payment_schedule: 'monthly',
-            milestone_count: 4,
-            completed_milestones: 2,
-            paid_amount: 7500.00,
-            created_at: '2025-01-10T10:00:00Z'
-          },
-          {
-            id: 2,
-            contract_number: 'CNT-2025-002',
-            title: 'Contrat de maintenance Application Mobile',
-            client_name: 'Innovate Corp',
-            status: 'signed',
-            start_date: '2025-02-01',
-            end_date: '2026-02-01',
-            contract_value: 8000.00,
-            contract_type: 'maintenance',
-            payment_schedule: 'quarterly',
-            milestone_count: 0,
-            completed_milestones: 0,
-            paid_amount: 0,
-            created_at: '2025-01-20T14:30:00Z'
-          },
-          {
-            id: 3,
-            contract_number: 'CNT-2025-003',
-            title: 'Contrat de conseil Digital',
-            client_name: 'StartupXYZ',
-            status: 'draft',
-            start_date: '2025-03-01',
-            end_date: '2025-09-01',
-            contract_value: 12000.00,
-            contract_type: 'consulting',
-            payment_schedule: 'milestone',
-            milestone_count: 3,
-            completed_milestones: 0,
-            paid_amount: 0,
-            created_at: '2025-02-01T09:15:00Z'
-          }
-        ],
-        pagination: {
-          current_page: 1,
-          total_pages: 1,
-          total_items: 3,
-          items_per_page: 10
-        },
-        statistics: {
-          total: 3,
-          draft: 1,
-          sent: 0,
-          signed: 1,
-          active: 1,
-          completed: 0,
-          expired: 0,
-          cancelled: 0,
-          total_value: 35000.00,
-          active_value: 15000.00
-        }
-      };
-      
-      setContracts(mockData.contracts);
-      setStatistics(mockData.statistics);
-      setTotalPages(mockData.pagination.total_pages);
+      setContracts(response.contracts);
+      setStatistics(response.statistics);
+      setTotalPages(response.pagination.total_pages);
     } catch (error) {
       toast.addToast('Erreur lors du chargement des contrats', { type: 'error' });
     } finally {
@@ -133,7 +62,7 @@ const ContractsList = () => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce contrat ?')) return;
     
     try {
-      // await contractsAPI.delete(contractId);
+      await contractsAPI.delete(contractId);
       toast.addToast('Contrat supprimé avec succès', { type: 'success' });
       loadContracts();
     } catch (error) {
