@@ -330,20 +330,23 @@ export default function SpecificationDetail() {
 
     return (
       <div className="relative mb-4">
-        {/* Lignes de connexion pour les sous-tâches */}
+        {/* Lignes de connexion depuis le parent */}
         {level > 1 && (
           <>
-            <div className="absolute left-0 top-0 w-px h-8 bg-black -ml-8" />
-            <div className="absolute left-0 top-8 w-8 h-px bg-black -ml-8" />
+            {/* Ligne verticale qui descend du parent */}
+            <div className="absolute -left-12 -top-4 w-px h-11 bg-black" />
+            {/* Ligne horizontale vers ce rectangle */}
+            <div className="absolute -left-12 top-7 w-12 h-px bg-black" />
           </>
         )}
         
+        {/* Ligne horizontale qui part de ce rectangle vers ses enfants */}
+        {hasChildren(feature.id) && expandedForThis && (
+          <div className="absolute right-0 top-7 w-12 h-px bg-black" />
+        )}
+        
         <div className={`
-          relative rounded border transition-all duration-200 ease-in-out min-h-16
-          ${feature.isCompleted 
-            ? 'border-green-300 bg-gradient-to-r from-green-50/70 to-emerald-50/70' 
-            : `${levelColors[level] || levelColors[3]} hover:shadow-md`
-          }
+          relative border border-black bg-white h-14 flex items-center px-4
           ${level === 1 ? 'ml-0' : 'ml-12'}
         `}>
         {editingFeature === feature.id ? (
