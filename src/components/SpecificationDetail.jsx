@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { featuresAPI } from '../lib/api';
+import { useParams, useNavigate } from 'react-router-dom';
+import { featuresAPI, specificationsAPI } from '../lib/api';
 import { useToast } from '../contexts/ToastContext';
 import {
   ArrowLeft,
@@ -18,7 +19,10 @@ import {
 import { pdf } from '@react-pdf/renderer';
 import SpecificationPDF from './SpecificationPDF';
 
-export default function SpecificationDetail({ specification, onBack }) {
+export default function SpecificationDetail() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [specification, setSpecification] = useState(null);
   const [features, setFeatures] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddFeature, setShowAddFeature] = useState(false);
@@ -31,19 +35,44 @@ export default function SpecificationDetail({ specification, onBack }) {
   const [activeTab, setActiveTab] = useState('document'); // 'document' ou 'tasks'
 
   useEffect(() => {
-    loadFeatures();
-  }, [specification.id]);
+    loadSpecification();
+  }, [id]);
+
+  const loadSpecification = async () => {
+    setLoading(true);
+    try {
+      // Charger la spécification
+      const specs = await specificationsAPI.getAll();
+      const spec = specs.find(s => s.id === parseInt(id));
+      
+      if (!spec) {
+        toast.addToast('Spécification non trouvée', { type: 'error' });
+        navigate('/');
+        return;
+      }
+      
+      setSpecification(spec);
+      
+      // Charger les features
+      const data = await featuresAPI.getBySpecification(parseInt(id));
+      setFeatures(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.addToast('Erreur lors du chargement', { type: 'error' });
+      setFeatures([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadFeatures = async () => {
-    setLoading(true);
+    if (!specification) return;
     try {
       const data = await featuresAPI.getBySpecification(specification.id);
       setFeatures(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Erreur:', error);
       setFeatures([]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -467,6 +496,14 @@ export default function SpecificationDetail({ specification, onBack }) {
     );
   }
 
+  if (loading || !specification) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
       <header className="bg-white/90 backdrop-blur-md border-b border-slate-200/50 shadow-sm sticky top-0 z-40">
@@ -474,7 +511,7 @@ export default function SpecificationDetail({ specification, onBack }) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2 sm:gap-4">
               <button
-                onClick={onBack}
+                onClick={() => navigate('/')}
                 className="flex items-center gap-1 sm:gap-2 text-slate-600 hover:text-slate-900 transition-all duration-200 group hover:bg-slate-100 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg"
               >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import Auth from './components/Auth';
 import SpecificationsList from './components/SpecificationsList';
@@ -7,7 +8,6 @@ import { Loader2 } from 'lucide-react';
 
 function App() {
   const { user, loading } = useAuth();
-  const [selectedSpecification, setSelectedSpecification] = useState(null);
 
   if (loading) {
     return (
@@ -21,16 +21,15 @@ function App() {
     return <Auth />;
   }
 
-  if (selectedSpecification) {
-    return (
-      <SpecificationDetail
-        specification={selectedSpecification}
-        onBack={() => setSelectedSpecification(null)}
-      />
-    );
-  }
-
-  return <SpecificationsList onSelectSpecification={setSelectedSpecification} />;
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<SpecificationsList />} />
+        <Route path="/specifications/:id" element={<SpecificationDetail />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;

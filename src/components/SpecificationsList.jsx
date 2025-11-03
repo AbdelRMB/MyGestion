@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { specificationsAPI, featuresAPI } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { FileText, Plus, LogOut, Loader2, Clock, CheckCircle2 } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
 
-export default function SpecificationsList({ onSelectSpecification }) {
+export default function SpecificationsList() {
   const [specifications, setSpecifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -123,10 +124,10 @@ export default function SpecificationsList({ onSelectSpecification }) {
             {specifications.map((spec) => {
               const stats = getCompletionStats(spec);
               return (
-                <div
+                <Link
                   key={spec.id}
-                  onClick={() => onSelectSpecification(spec)}
-                  className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 cursor-pointer hover:shadow-lg hover:border-blue-300 transition-all group"
+                  to={`/specifications/${spec.id}`}
+                  className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 cursor-pointer hover:shadow-lg hover:border-blue-300 transition-all group block"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-colors">
@@ -171,7 +172,7 @@ export default function SpecificationsList({ onSelectSpecification }) {
                     <Clock className="w-3.5 h-3.5" />
                     Modifié {new Date(spec.updatedAt).toLocaleDateString('fr-FR')}
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
