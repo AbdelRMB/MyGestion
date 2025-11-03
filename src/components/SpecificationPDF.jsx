@@ -5,10 +5,10 @@ const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
-    padding: 40,
+    padding: 50,
     fontFamily: 'Helvetica',
     fontSize: 11,
-    lineHeight: 1.4,
+    lineHeight: 1.5,
   },
   
   // En-tête du document
@@ -68,9 +68,25 @@ const styles = StyleSheet.create({
   
   tocItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 6,
-    marginBottom: 4,
+    alignItems: 'flex-start',
+    paddingVertical: 4,
+    marginBottom: 6,
+  },
+  
+  tocNumber: {
+    width: 25,
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#000000',
+    textAlign: 'left',
+  },
+  
+  tocNumberSub: {
+    width: 45,
+    fontSize: 11,
+    color: '#000000',
+    textAlign: 'left',
+    paddingLeft: 20,
   },
   
   tocItemLevel1: {
@@ -80,7 +96,6 @@ const styles = StyleSheet.create({
   },
   
   tocItemLevel2: {
-    marginLeft: 25,
     fontSize: 11,
     marginBottom: 2,
   },
@@ -93,21 +108,18 @@ const styles = StyleSheet.create({
   tocLink: {
     color: '#000000',
     textDecoration: 'none',
-    cursor: 'pointer',
   },
   
   tocLinkLevel2: {
     color: '#000000',
     textDecoration: 'none',
-    cursor: 'pointer',
   },
   
   tocDots: {
-    flex: 1,
+    width: 30,
     textAlign: 'right',
     color: '#000000',
     fontSize: 10,
-    marginLeft: 10,
   },
 
   // Contenu principal
@@ -115,38 +127,52 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#000000',
-    marginTop: 25,
-    marginBottom: 15,
-    paddingBottom: 8,
+  sectionContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 30,
+    marginBottom: 20,
+    paddingBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#000000',
   },
   
   sectionNumber: {
-    color: '#000000',
-    marginRight: 8,
+    width: 25,
     fontSize: 14,
     fontWeight: 'bold',
+    color: '#000000',
+    textAlign: 'left',
+  },
+  
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#000000',
+    flex: 1,
+  },
+  
+  subsectionContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 18,
+    marginBottom: 12,
+    marginLeft: 20,
+  },
+  
+  subsectionNumber: {
+    width: 45,
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#000000',
+    textAlign: 'left',
   },
   
   subsectionTitle: {
     fontSize: 12,
     fontWeight: 'bold',
     color: '#000000',
-    marginTop: 15,
-    marginBottom: 10,
-    marginLeft: 20,
-  },
-  
-  subsectionNumber: {
-    color: '#000000',
-    marginRight: 6,
-    fontSize: 12,
-    fontWeight: 'bold',
+    flex: 1,
   },
   
   description: {
@@ -170,7 +196,7 @@ const styles = StyleSheet.create({
   },
   
   bulletList: {
-    marginLeft: 40,
+    marginLeft: 45,
     marginTop: 10,
     marginBottom: 15,
   },
@@ -182,12 +208,12 @@ const styles = StyleSheet.create({
   },
   
   bulletPoint: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
     backgroundColor: '#000000',
-    marginRight: 12,
-    marginTop: 5,
+    marginRight: 10,
+    marginTop: 6,
     flexShrink: 0,
   },
   
@@ -283,26 +309,30 @@ const SpecificationPDF = ({ specification, features, generateTableOfContents, ge
             {tableOfContents.map((item, index) => (
               <View key={item.id}>
                 {/* Niveau 1 */}
-                <View style={[styles.tocItem, styles.tocItemLevel1]}>
+                <View style={styles.tocItem}>
+                  <Text style={styles.tocNumber}>{item.index}.</Text>
                   <Link src={`#section-${item.id}`} style={[styles.tocItemText, styles.tocLink]}>
-                    <Text>
-                      {item.index}. {item.title}
+                    <Text style={styles.tocItemLevel1}>
+                      {item.title}
                     </Text>
                   </Link>
                   <Text style={styles.tocDots}>
-                    {item.children.length > 0 ? '························' : '- - - - - - - - - -'}
+                    {Array(15).fill('·').join('')}
                   </Text>
                 </View>
                 
                 {/* Niveau 2 */}
                 {item.children.map((child) => (
-                  <View key={child.id} style={[styles.tocItem, styles.tocItemLevel2]}>
+                  <View key={child.id} style={styles.tocItem}>
+                    <Text style={styles.tocNumberSub}>{child.index}</Text>
                     <Link src={`#section-${child.id}`} style={[styles.tocItemText, styles.tocLinkLevel2]}>
-                      <Text>
-                        {child.index} {child.title}
+                      <Text style={styles.tocItemLevel2}>
+                        {child.title}
                       </Text>
                     </Link>
-                    <Text style={styles.tocDots}>- - - - - - - - -</Text>
+                    <Text style={styles.tocDots}>
+                      {Array(12).fill('·').join('')}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -332,9 +362,9 @@ const SpecificationPDF = ({ specification, features, generateTableOfContents, ge
           {tableOfContents.map((item, sectionIndex) => (
             <View key={`content-${item.id}`}>
               {/* Section Niveau 1 */}
-              <View style={styles.sectionTitle} id={`section-${item.id}`}>
-                <Text style={styles.sectionNumber}>{item.index}</Text>
-                <Text style={{ flex: 1 }}>
+              <View style={styles.sectionContainer} id={`section-${item.id}`}>
+                <Text style={styles.sectionNumber}>{item.index}.</Text>
+                <Text style={styles.sectionTitle}>
                   {item.title}
                   {item.description && (
                     <Text style={styles.inlineDescription}> {item.description}</Text>
@@ -345,9 +375,9 @@ const SpecificationPDF = ({ specification, features, generateTableOfContents, ge
               {/* Sous-sections Niveau 2 */}
               {item.children.map((child) => (
                 <View key={child.id}>
-                  <View style={styles.subsectionTitle} id={`section-${child.id}`}>
+                  <View style={styles.subsectionContainer} id={`section-${child.id}`}>
                     <Text style={styles.subsectionNumber}>{child.index}</Text>
-                    <Text style={{ flex: 1 }}>
+                    <Text style={styles.subsectionTitle}>
                       {child.title}
                       {child.description && (
                         <Text style={styles.inlineDescriptionSub}> {child.description}</Text>
