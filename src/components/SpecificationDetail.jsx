@@ -25,6 +25,7 @@ export default function SpecificationDetail({ specification, onBack }) {
   const [addLevel, setAddLevel] = useState(1);
   const [addParentId, setAddParentId] = useState('');
   const [expanded, setExpanded] = useState({});
+  const [activeTab, setActiveTab] = useState('document'); // 'document' ou 'tasks'
 
   useEffect(() => {
     loadFeatures();
@@ -228,6 +229,34 @@ export default function SpecificationDetail({ specification, onBack }) {
   const progressPercentage = features.length > 0
     ? Math.round((completedCount / features.length) * 100)
     : 0;
+
+  // Fonction pour générer la table des matières
+  const generateTableOfContents = () => {
+    const level1Features = levelList(1);
+    
+    return level1Features.map((feature, index) => {
+      const children = getChildren(feature.id);
+      const hasLevel2Children = children.length > 0;
+      
+      return {
+        ...feature,
+        index: index + 1,
+        children: hasLevel2Children ? children.map((child, childIndex) => {
+          const grandChildren = getChildren(child.id);
+          const hasLevel3Children = grandChildren.length > 0;
+          
+          return {
+            ...child,
+            index: `${index + 1}.${childIndex + 1}`,
+            children: hasLevel3Children ? grandChildren.map((grandChild, grandChildIndex) => ({
+              ...grandChild,
+              index: `${index + 1}.${childIndex + 1}.${grandChildIndex + 1}`,
+            })) : []
+          };
+        }) : []
+      };
+    });
+  };
 
   // Inline component to render a feature and its nested children
   function FeatureItem({ feature, level = 1, index = 0 }) {
@@ -457,69 +486,183 @@ export default function SpecificationDetail({ specification, onBack }) {
                 <div className="text-sm sm:text-base lg:text-lg font-bold leading-tight">{progressPercentage}%</div>
               </div>
 
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-1 sm:gap-2 group text-xs sm:text-sm"
-              >
-                <Plus className="w-3 sm:w-4 h-3 sm:h-4 group-hover:scale-110 transition-transform duration-200" />
-                <span className="hidden xs:inline">Ajouter</span>
-                <span className="xs:hidden">+</span>
-              </button>
+              {activeTab === 'tasks' && (
+                <button
+                  onClick={() => setShowAddFeature(true)}
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-1 sm:gap-2 group text-xs sm:text-sm"
+                >
+                  <Plus className="w-3 sm:w-4 h-3 sm:h-4 group-hover:scale-110 transition-transform duration-200" />
+                  <span className="hidden xs:inline">Ajouter</span>
+                  <span className="xs:hidden">+</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4">
-        {features.length > 0 && (
-          <div className="mb-3 sm:mb-4 bg-gradient-to-r from-white to-slate-50 rounded-xl p-3 sm:p-4 border border-slate-200 shadow-sm">
-            <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 mb-2">
-              <h3 className="text-sm sm:text-base font-semibold text-slate-900">Progression</h3>
-              <span className="text-xs font-medium text-slate-600">{completedCount} / {features.length} terminées</span>
-            </div>
-            <div className="w-full bg-slate-200 rounded-full h-1.5 sm:h-2 overflow-hidden">
-              <div 
-                className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 h-full transition-all duration-700 ease-out rounded-full" 
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="flex items-center justify-between mb-3 sm:mb-4">
-          <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-            Fonctionnalités
-          </h2>
-        </div>
-
-        {loading ? (
-          <div className="flex items-center justify-center py-12 sm:py-20">
-            <Loader2 className="w-6 sm:w-8 h-6 sm:h-8 animate-spin text-blue-600" />
-          </div>
-        ) : features.length === 0 ? (
-          <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-md border border-slate-200 p-6 sm:p-8 text-center">
-            <div className="w-12 sm:w-16 h-12 sm:h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-              <Circle className="w-6 sm:w-8 h-6 sm:h-8 text-slate-400" />
-            </div>
-            <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Aucune fonctionnalité</h3>
-            <p className="text-slate-600 mb-4 sm:mb-6 max-w-xs sm:max-w-sm mx-auto text-xs sm:text-sm">
-              Ajoutez des fonctionnalités avec jusqu'à 3 niveaux hiérarchiques.
-            </p>
-            <button 
-              onClick={openAddModal} 
-              className="inline-flex items-center gap-1 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg text-xs sm:text-sm"
+      {/* Onglets */}
+      <div className="bg-white/50 backdrop-blur-sm border-b border-slate-200/50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
+          <div className="flex">
+            <button
+              onClick={() => setActiveTab('document')}
+              className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium border-b-2 transition-all duration-200 ${
+                activeTab === 'document'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
+              }`}
             >
-              <Plus className="w-4 sm:w-5 h-4 sm:h-5" /> 
-              <span className="hidden sm:inline">Créer ma première fonctionnalité</span>
-              <span className="sm:hidden">Créer une fonctionnalité</span>
+              📄 Cahier des charges
+            </button>
+            <button
+              onClick={() => setActiveTab('tasks')}
+              className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium border-b-2 transition-all duration-200 ${
+                activeTab === 'tasks'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
+              }`}
+            >
+              ✅ Tâches
             </button>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {levelList(1).map((feature, idx) => (
-              <FeatureItem key={feature.id} feature={feature} level={1} index={idx} />
-            ))}
+        </div>
+      </div>
+
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4">
+        {activeTab === 'document' ? (
+          // Vue Cahier des charges (PDF-like)
+          <div className="bg-white shadow-xl rounded-lg border border-slate-200 min-h-[800px] p-8 sm:p-12">
+            {/* En-tête du document */}
+            <div className="text-center mb-12 border-b-2 border-slate-200 pb-8">
+              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+                CAHIER DES CHARGES
+              </h1>
+              <h2 className="text-xl sm:text-2xl text-blue-800 font-semibold">
+                {specification.title}
+              </h2>
+              {specification.description && (
+                <p className="text-slate-600 mt-4 text-lg max-w-4xl mx-auto leading-relaxed">
+                  {specification.description}
+                </p>
+              )}
+              <div className="mt-6 text-sm text-slate-500">
+                Document généré le {new Date().toLocaleDateString('fr-FR')}
+              </div>
+            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+              </div>
+            ) : features.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-slate-500 text-lg">Aucune fonctionnalité définie pour ce cahier des charges.</p>
+              </div>
+            ) : (
+              <>
+                {/* Table des matières */}
+                <div className="mb-12">
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-300 pb-2">
+                    TABLE DES MATIÈRES
+                  </h2>
+                  <div className="space-y-2">
+                    {generateTableOfContents().map((item) => (
+                      <div key={item.id}>
+                        {/* Niveau 1 */}
+                        <div className="flex justify-between items-center py-2 border-b border-dotted border-slate-200">
+                          <span className="font-semibold text-slate-900">
+                            {item.index}. {item.title}
+                          </span>
+                          <span className="text-slate-400">
+                            {item.children.length > 0 ? '.....................' : '- - - - - - - - - -'}
+                          </span>
+                        </div>
+                        
+                        {/* Niveau 2 */}
+                        {item.children.map((child) => (
+                          <div key={child.id}>
+                            <div className="flex justify-between items-center py-1 ml-6 text-sm border-b border-dotted border-slate-100">
+                              <span className="text-slate-700">
+                                {child.index} {child.title}
+                              </span>
+                              <span className="text-slate-300">
+                                {child.children.length > 0 ? '................' : '- - - - - - -'}
+                              </span>
+                            </div>
+                            
+                            {/* Niveau 3 */}
+                            {child.children.map((grandChild) => (
+                              <div key={grandChild.id} className="flex justify-between items-center py-1 ml-12 text-sm text-slate-600">
+                                <span>
+                                  {grandChild.index} {grandChild.title}
+                                </span>
+                                <span className="text-slate-300">- - - - -</span>
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
+        ) : (
+          // Vue Tâches (ancienne vue)
+          <>
+            {features.length > 0 && (
+              <div className="mb-3 sm:mb-4 bg-gradient-to-r from-white to-slate-50 rounded-xl p-3 sm:p-4 border border-slate-200 shadow-sm">
+                <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 mb-2">
+                  <h3 className="text-sm sm:text-base font-semibold text-slate-900">Progression</h3>
+                  <span className="text-xs font-medium text-slate-600">{completedCount} / {features.length} terminées</span>
+                </div>
+                <div className="w-full bg-slate-200 rounded-full h-1.5 sm:h-2 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 h-full transition-all duration-700 ease-out rounded-full" 
+                    style={{ width: `${progressPercentage}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                Fonctionnalités
+              </h2>
+            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-12 sm:py-20">
+                <Loader2 className="w-6 sm:w-8 h-6 sm:h-8 animate-spin text-blue-600" />
+              </div>
+            ) : features.length === 0 ? (
+              <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-md border border-slate-200 p-6 sm:p-8 text-center">
+                <div className="w-12 sm:w-16 h-12 sm:h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <Circle className="w-6 sm:w-8 h-6 sm:h-8 text-slate-400" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Aucune fonctionnalité</h3>
+                <p className="text-slate-600 mb-4 sm:mb-6 max-w-xs sm:max-w-sm mx-auto text-xs sm:text-sm">
+                  Ajoutez des fonctionnalités avec jusqu'à 3 niveaux hiérarchiques.
+                </p>
+                <button 
+                  onClick={() => setShowAddFeature(true)} 
+                  className="inline-flex items-center gap-1 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg text-xs sm:text-sm"
+                >
+                  <Plus className="w-4 sm:w-5 h-4 sm:h-5" /> 
+                  <span className="hidden sm:inline">Créer ma première fonctionnalité</span>
+                  <span className="sm:hidden">Créer une fonctionnalité</span>
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2 sm:space-y-4">
+                {levelList(1).map((feature, idx) => (
+                  <FeatureItem key={feature.id} feature={feature} level={1} index={idx} />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </main>
 
