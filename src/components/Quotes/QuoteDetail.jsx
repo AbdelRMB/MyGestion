@@ -16,12 +16,23 @@ import {
   Mail,
   Phone,
   Edit2,
-  X
+  X,
+  Check,
+  XCircle,
+  FileCheck
 } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
 import QuotePDF from './QuotePDF.jsx';
 
 
+
+const statusConfig = {
+  draft: { label: 'Brouillon', color: 'bg-gray-100 text-gray-700', icon: '📝' },
+  sent: { label: 'Envoyé', color: 'bg-blue-100 text-blue-700', icon: '📤' },
+  accepted: { label: 'Accepté', color: 'bg-green-100 text-green-700', icon: '✅' },
+  rejected: { label: 'Refusé', color: 'bg-red-100 text-red-700', icon: '❌' },
+  expired: { label: 'Expiré', color: 'bg-orange-100 text-orange-700', icon: '⏰' }
+};
 
 export default function QuoteDetail() {
   const { id } = useParams();
@@ -91,6 +102,42 @@ export default function QuoteDetail() {
       console.error('Erreur lors de la génération du PDF:', error);
       toast.addToast('Erreur lors de la génération du PDF', { type: 'error' });
     }
+  };
+
+  const handleMarkAsSent = async () => {
+    try {
+      await quotesAPI.updateStatus(quote.id, 'sent');
+      setQuote(prev => ({ ...prev, status: 'sent' }));
+      toast.addToast('Devis marqué comme envoyé', { type: 'success' });
+    } catch (error) {
+      toast.addToast('Erreur lors de la mise à jour du statut', { type: 'error' });
+    }
+  };
+
+  const handleMarkAsAccepted = async () => {
+    try {
+      await quotesAPI.updateStatus(quote.id, 'accepted');
+      setQuote(prev => ({ ...prev, status: 'accepted' }));
+      toast.addToast('Devis marqué comme accepté', { type: 'success' });
+    } catch (error) {
+      toast.addToast('Erreur lors de la mise à jour du statut', { type: 'error' });
+    }
+  };
+
+  const handleMarkAsRejected = async () => {
+    try {
+      await quotesAPI.updateStatus(quote.id, 'rejected');
+      setQuote(prev => ({ ...prev, status: 'rejected' }));
+      toast.addToast('Devis marqué comme refusé', { type: 'success' });
+    } catch (error) {
+      toast.addToast('Erreur lors de la mise à jour du statut', { type: 'error' });
+    }
+  };
+
+  const handleSaveAsDraft = async () => {
+    await handleSave();
+    setEditMode(false);
+    // Le devis reste en brouillon après sauvegarde
   };
 
   const addItem = () => {
@@ -185,9 +232,14 @@ export default function QuoteDetail() {
               Retour
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {quote.number}
-              </h1>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {quote.number}
+                </h1>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusConfig[quote.status]?.color}`}>
+                  {statusConfig[quote.status]?.icon} {statusConfig[quote.status]?.label}
+                </span>
+              </div>
               <p className="text-gray-600">{quote.title}</p>
             </div>
           </div>
@@ -203,7 +255,7 @@ export default function QuoteDetail() {
                   Annuler
                 </button>
                 <button
-                  onClick={handleSave}
+                  onClick={handleSaveAsDraft}
                   disabled={saving}
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
                 >
@@ -213,33 +265,105 @@ export default function QuoteDetail() {
               </>
             ) : (
               <>
-                <button
-                  onClick={() => setEditMode(true)}
-                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Edit2 className="w-4 h-4" />
-                  Modifier
-                </button>
+                {/* Workflow basé sur le statut */}
                 {quote.status === 'draft' && (
-                  <button
-                    onClick={handleSendByEmail}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  <>
+                    <button
+                      onClick={() => setEditMode(true)}
+                      className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      Modifier
+                    </button>
+                    <button
+                      onClick={handleMarkAsSent}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <FileCheck className="w-4 h-4" />
+                      Finaliser et Envoyer
+                    </button>
+                  </>
+                )}
+
+                {quote.status === 'sent' && (
+                  <>
+                    <button 
+                      onClick={exportToPDF}
+                      className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                      Télécharger PDF
+                    </button>
+                    <button
+                      onClick={handleSendByEmail}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <Send className="w-4 h-4" />
+                      Envoyer par Email
+                    </button>
+                    <button
+                      onClick={handleMarkAsAccepted}
+                      className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      <Check className="w-4 h-4" />
+                      Marquer Accepté
+                    </button>
+                    <button
+                      onClick={handleMarkAsRejected}
+                      className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      Marquer Refusé
+                    </button>
+                  </>
+                )}
+
+                {(quote.status === 'accepted' || quote.status === 'rejected' || quote.status === 'expired') && (
+                  <button 
+                    onClick={exportToPDF}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
-                    <Send className="w-4 h-4" />
-                    Envoyer
+                    <Download className="w-4 h-4" />
+                    Télécharger PDF
                   </button>
                 )}
-                <button 
-                  onClick={exportToPDF}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  PDF
-                </button>
               </>
             )}
           </div>
         </div>
+
+        {/* Message d'aide basé sur le statut */}
+        {quote.status === 'draft' && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-700">
+              <strong>Brouillon :</strong> Vous pouvez modifier ce devis. Cliquez sur "Finaliser et Envoyer" quand vous êtes prêt.
+            </p>
+          </div>
+        )}
+
+        {quote.status === 'sent' && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <p className="text-sm text-amber-700">
+              <strong>Envoyé :</strong> Le devis a été finalisé. Vous pouvez le télécharger, l'envoyer par email, ou mettre à jour son statut.
+            </p>
+          </div>
+        )}
+
+        {quote.status === 'accepted' && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-sm text-green-700">
+              <strong>Accepté :</strong> Ce devis a été accepté par le client. Félicitations !
+            </p>
+          </div>
+        )}
+
+        {quote.status === 'rejected' && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-sm text-red-700">
+              <strong>Refusé :</strong> Ce devis a été refusé par le client.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
