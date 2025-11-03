@@ -248,20 +248,20 @@ export default function SpecificationDetail({ specification, onBack }) {
 
     return (
       <div className={`
-        relative rounded-xl shadow-sm border transition-all duration-200 ease-in-out
+        relative rounded-lg sm:rounded-xl shadow-sm border transition-all duration-200 ease-in-out
         ${feature.isCompleted 
           ? 'border-green-300 bg-gradient-to-r from-green-50/70 to-emerald-50/70' 
           : `${levelColors[level] || levelColors[3]} hover:shadow-md`
         }
-        ${level > 1 ? 'ml-4 mt-2' : 'mb-3'}
+        ${level > 1 ? 'ml-2 sm:ml-4 mt-1 sm:mt-2' : 'mb-2 sm:mb-3'}
       `}>
         {editingFeature === feature.id ? (
-          <form onSubmit={(e) => handleUpdateFeature(feature.id, e)} className="p-3">
+          <form onSubmit={(e) => handleUpdateFeature(feature.id, e)} className="p-2 sm:p-3">
             <input 
               type="text" 
               name="title" 
               defaultValue={feature.title} 
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" 
+              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm" 
               placeholder="Titre de la fonctionnalité" 
               required 
             />
@@ -269,14 +269,14 @@ export default function SpecificationDetail({ specification, onBack }) {
               name="description" 
               defaultValue={feature.description} 
               rows={2} 
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm" 
+              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg mb-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-xs sm:text-sm" 
               placeholder="Description (optionnel)" 
             />
 
-            <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">Niveau</label>
-                <select name="level" defaultValue={feature.level || 1} className="w-full px-2 py-1.5 border border-slate-300 rounded text-sm">
+                <select name="level" defaultValue={feature.level || 1} className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs sm:text-sm">
                   <option value={1}>1</option>
                   <option value={2}>2</option>
                   <option value={3}>3</option>
@@ -285,7 +285,7 @@ export default function SpecificationDetail({ specification, onBack }) {
 
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">Parent</label>
-                <select name="parentId" defaultValue={feature.parentId ?? ''} className="w-full px-2 py-1.5 border border-slate-300 rounded text-sm">
+                <select name="parentId" defaultValue={feature.parentId ?? ''} className="w-full px-2 py-1.5 border border-slate-300 rounded text-xs sm:text-sm">
                   <option value="">Aucun</option>
                   {features.filter((f) => f.id !== feature.id && Number(f.level || 1) === (Number(feature.level || 1) - 1)).map((f) => (
                     <option key={f.id} value={f.id}>{f.title}</option>
@@ -304,8 +304,8 @@ export default function SpecificationDetail({ specification, onBack }) {
             </div>
           </form>
         ) : (
-          <div className="p-3">
-            <div className="flex items-start gap-3">
+          <div className="p-2 sm:p-3">
+            <div className="flex items-start gap-2 sm:gap-3">
               {/* hide completion toggle when feature has children */}
               {!hasChildren(feature.id) ? (
                 <button 
@@ -313,34 +313,34 @@ export default function SpecificationDetail({ specification, onBack }) {
                   className="flex-shrink-0 mt-0.5 transition-all duration-200 hover:scale-110 active:scale-95"
                 >
                   {feature.isCompleted ? (
-                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                    <CheckCircle2 className="w-4 sm:w-5 h-4 sm:h-5 text-green-600" />
                   ) : (
-                    <Circle className="w-5 h-5 text-slate-400 hover:text-blue-600 transition-colors duration-200" />
+                    <Circle className="w-4 sm:w-5 h-4 sm:h-5 text-slate-400 hover:text-blue-600 transition-colors duration-200" />
                   )}
                 </button>
               ) : (
-                <div className="flex-shrink-0 mt-0.5 w-5 h-5 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full flex items-center justify-center">
+                <div className="flex-shrink-0 mt-0.5 w-4 sm:w-5 h-4 sm:h-5 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full flex items-center justify-center">
                   <span className="text-xs font-bold text-white">{children.filter(c => c.isCompleted).length}/{children.length}</span>
                 </div>
               )}
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+                <div className="flex items-start justify-between gap-2 sm:gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2 flex-wrap">
+                      <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
                         #{index + 1}
                       </span>
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${levelBadgeColors[level] || levelBadgeColors[3]}`}>
+                      <span className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-xs font-medium ${levelBadgeColors[level] || levelBadgeColors[3]}`}>
                         N{feature.level || 1}
                       </span>
                       {feature.isCompleted && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                        <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                           ✓
                         </span>
                       )}
                     </div>
-                    <h3 className={`text-base font-semibold transition-all duration-300 ${
+                    <h3 className={`text-sm sm:text-base font-semibold transition-all duration-300 leading-tight ${
                       feature.isCompleted 
                         ? 'text-green-700 line-through opacity-75' 
                         : 'text-slate-900'
@@ -348,7 +348,7 @@ export default function SpecificationDetail({ specification, onBack }) {
                       {feature.title}
                     </h3>
                     {feature.description && (
-                      <p className={`text-xs mt-1 leading-relaxed ${
+                      <p className={`text-xs mt-0.5 sm:mt-1 leading-relaxed ${
                         feature.isCompleted 
                           ? 'text-green-600/70' 
                           : 'text-slate-600'
@@ -358,20 +358,20 @@ export default function SpecificationDetail({ specification, onBack }) {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-0.5 sm:gap-1">
                     <button 
                       onClick={() => setEditingFeature(feature.id)} 
-                      className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200" 
+                      className="p-1.5 sm:p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200" 
                       title="Modifier"
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit2 className="w-3 sm:w-4 h-3 sm:h-4" />
                     </button>
                     <button 
                       onClick={() => handleDeleteFeature(feature.id)} 
-                      className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200" 
+                      className="p-1.5 sm:p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200" 
                       title="Supprimer"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3 sm:w-4 h-3 sm:h-4" />
                     </button>
                   </div>
                 </div>
@@ -417,66 +417,67 @@ export default function SpecificationDetail({ specification, onBack }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
       <header className="bg-white/90 backdrop-blur-md border-b border-slate-200/50 shadow-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2 sm:gap-4">
               <button
                 onClick={onBack}
-                className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-all duration-200 group hover:bg-slate-100 px-3 py-2 rounded-lg"
+                className="flex items-center gap-1 sm:gap-2 text-slate-600 hover:text-slate-900 transition-all duration-200 group hover:bg-slate-100 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg"
               >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />
-                <span className="font-medium text-sm">Retour</span>
+                <span className="font-medium text-xs sm:text-sm">Retour</span>
               </button>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-900 bg-clip-text text-transparent">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-900 bg-clip-text text-transparent">
                   {specification.title}
                 </h1>
                 {specification.description && (
-                  <p className="text-slate-600 text-sm mt-1 max-w-2xl truncate">
+                  <p className="text-slate-600 text-xs sm:text-sm mt-0.5 sm:mt-1 max-w-full sm:max-w-2xl truncate">
                     {specification.description}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1.5 rounded-lg shadow-sm">
+            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-wrap justify-end sm:justify-start">
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm">
                 <div className="text-xs font-medium opacity-90">Total</div>
-                <div className="text-lg font-bold leading-tight">{features.length}</div>
+                <div className="text-sm sm:text-base lg:text-lg font-bold leading-tight">{features.length}</div>
               </div>
               
-              <div className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-3 py-1.5 rounded-lg shadow-sm">
-                <div className="text-xs font-medium opacity-90">Terminées</div>
-                <div className="text-lg font-bold leading-tight">
+              <div className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm">
+                <div className="text-xs font-medium opacity-90">OK</div>
+                <div className="text-sm sm:text-base lg:text-lg font-bold leading-tight">
                   {features.filter(f => f.isCompleted).length}
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-3 py-1.5 rounded-lg shadow-sm">
-                <div className="text-xs font-medium opacity-90">Progrès</div>
-                <div className="text-lg font-bold leading-tight">{progressPercentage}%</div>
+              <div className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm">
+                <div className="text-xs font-medium opacity-90">%</div>
+                <div className="text-sm sm:text-base lg:text-lg font-bold leading-tight">{progressPercentage}%</div>
               </div>
 
               <button
                 onClick={() => setShowAddModal(true)}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-semibold shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-2 group text-sm"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-1 sm:gap-2 group text-xs sm:text-sm"
               >
-                <Plus className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
-                Ajouter
+                <Plus className="w-3 sm:w-4 h-3 sm:h-4 group-hover:scale-110 transition-transform duration-200" />
+                <span className="hidden xs:inline">Ajouter</span>
+                <span className="xs:hidden">+</span>
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4">
         {features.length > 0 && (
-          <div className="mb-4 bg-gradient-to-r from-white to-slate-50 rounded-xl p-4 border border-slate-200 shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-slate-900">Progression globale</h3>
-              <span className="text-sm font-medium text-slate-600">{completedCount} / {features.length} terminées</span>
+          <div className="mb-3 sm:mb-4 bg-gradient-to-r from-white to-slate-50 rounded-xl p-3 sm:p-4 border border-slate-200 shadow-sm">
+            <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 mb-2">
+              <h3 className="text-sm sm:text-base font-semibold text-slate-900">Progression</h3>
+              <span className="text-xs font-medium text-slate-600">{completedCount} / {features.length} terminées</span>
             </div>
-            <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-slate-200 rounded-full h-1.5 sm:h-2 overflow-hidden">
               <div 
                 className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 h-full transition-all duration-700 ease-out rounded-full" 
                 style={{ width: `${progressPercentage}%` }}
@@ -485,31 +486,32 @@ export default function SpecificationDetail({ specification, onBack }) {
           </div>
         )}
 
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
             Fonctionnalités
           </h2>
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <div className="flex items-center justify-center py-12 sm:py-20">
+            <Loader2 className="w-6 sm:w-8 h-6 sm:h-8 animate-spin text-blue-600" />
           </div>
         ) : features.length === 0 ? (
-          <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-md border border-slate-200 p-8 text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Circle className="w-8 h-8 text-slate-400" />
+          <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-md border border-slate-200 p-6 sm:p-8 text-center">
+            <div className="w-12 sm:w-16 h-12 sm:h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <Circle className="w-6 sm:w-8 h-6 sm:h-8 text-slate-400" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">Aucune fonctionnalité</h3>
-            <p className="text-slate-600 mb-6 max-w-sm mx-auto text-sm">
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Aucune fonctionnalité</h3>
+            <p className="text-slate-600 mb-4 sm:mb-6 max-w-xs sm:max-w-sm mx-auto text-xs sm:text-sm">
               Ajoutez des fonctionnalités avec jusqu'à 3 niveaux hiérarchiques.
             </p>
             <button 
               onClick={openAddModal} 
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg text-sm"
+              className="inline-flex items-center gap-1 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg text-xs sm:text-sm"
             >
-              <Plus className="w-5 h-5" /> 
-              Créer ma première fonctionnalité
+              <Plus className="w-4 sm:w-5 h-4 sm:h-5" /> 
+              <span className="hidden sm:inline">Créer ma première fonctionnalité</span>
+              <span className="sm:hidden">Créer une fonctionnalité</span>
             </button>
           </div>
         ) : (
@@ -522,23 +524,23 @@ export default function SpecificationDetail({ specification, onBack }) {
       </main>
 
       {showAddFeature && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 border border-slate-200">
-            <div className="text-center mb-6">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Plus className="w-6 h-6 text-white" />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl w-full max-w-sm sm:max-w-lg p-4 sm:p-6 border border-slate-200 mx-3">
+            <div className="text-center mb-4 sm:mb-6">
+              <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <Plus className="w-5 sm:w-6 h-5 sm:h-6 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900">
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900">
                 Nouvelle fonctionnalité
               </h3>
             </div>
-            <form onSubmit={handleAddFeature} className="space-y-4">
+            <form onSubmit={handleAddFeature} className="space-y-3 sm:space-y-4">
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-1">Titre *</label>
                 <input type="text" id="title" name="title" required className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" placeholder="Ex: Système d'authentification" />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="level" className="block text-sm font-medium text-slate-700 mb-1">Niveau</label>
                   <select id="level" name="level" value={addLevel} onChange={(e) => { setAddLevel(Number(e.target.value)); setAddParentId(''); }} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
@@ -587,18 +589,18 @@ export default function SpecificationDetail({ specification, onBack }) {
       )}
 
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-60">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 border border-red-200">
-            <div className="text-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Trash2 className="w-6 h-6 text-white" />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-60">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl w-full max-w-xs sm:max-w-md p-4 sm:p-6 border border-red-200 mx-3">
+            <div className="text-center mb-3 sm:mb-4">
+              <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-lg sm:rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <Trash2 className="w-5 sm:w-6 h-5 sm:h-6 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Confirmer la suppression</h3>
-              <p className="text-slate-600 text-sm">
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2">Confirmer la suppression</h3>
+              <p className="text-slate-600 text-xs sm:text-sm">
                 Supprimer cette fonctionnalité et toutes ses sous-tâches ?
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <button 
                 onClick={() => setShowDeleteConfirm(null)} 
                 className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-all duration-200 font-medium text-sm"
