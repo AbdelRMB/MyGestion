@@ -14,75 +14,75 @@ const styles = StyleSheet.create({
   // En-tête du document
   header: {
     textAlign: 'center',
-    marginBottom: 40,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
+    marginBottom: 50,
+    paddingBottom: 25,
+    borderBottomWidth: 2,
     borderBottomColor: '#000000',
   },
   
   documentTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#000000',
-    marginBottom: 8,
+    marginBottom: 15,
+    letterSpacing: 3,
   },
   
   projectTitle: {
-    fontSize: 20,
-    fontWeight: 'normal',
+    fontSize: 18,
+    fontWeight: 'bold',
     color: '#000000',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   
   projectDescription: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#000000',
-    marginBottom: 8,
-    maxWidth: '80%',
-    alignSelf: 'center',
+    marginBottom: 15,
+    textAlign: 'center',
+    lineHeight: 1.5,
   },
   
   documentDate: {
-    fontSize: 10,
-    color: '#000000',
-    marginTop: 8,
+    fontSize: 9,
+    color: '#666666',
+    marginTop: 10,
   },
 
   // Table des matières
   tocTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#000000',
-    marginBottom: 20,
-    marginTop: 30,
-    paddingBottom: 8,
+    marginBottom: 25,
+    marginTop: 40,
+    paddingBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#000000',
+    textAlign: 'left',
   },
   
   tocSection: {
-    marginBottom: 20,
+    marginBottom: 25,
   },
   
   tocItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    marginBottom: 2,
+    paddingVertical: 6,
+    marginBottom: 4,
   },
   
   tocItemLevel1: {
-    backgroundColor: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 12,
+    marginBottom: 3,
   },
   
   tocItemLevel2: {
-    backgroundColor: '#FFFFFF',
-    marginLeft: 20,
+    marginLeft: 25,
     fontSize: 11,
+    marginBottom: 2,
   },
   
   tocItemText: {
@@ -103,10 +103,11 @@ const styles = StyleSheet.create({
   },
   
   tocDots: {
-    flex: 2,
-    textAlign: 'center',
-    color: '#94A3B8',
-    fontSize: 8,
+    flex: 1,
+    textAlign: 'right',
+    color: '#000000',
+    fontSize: 10,
+    marginLeft: 10,
   },
 
   // Contenu principal
@@ -115,44 +116,45 @@ const styles = StyleSheet.create({
   },
   
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#000000',
-    marginTop: 30,
-    marginBottom: 12,
-    paddingBottom: 6,
+    marginTop: 25,
+    marginBottom: 15,
+    paddingBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#000000',
   },
   
   sectionNumber: {
     color: '#000000',
-    marginRight: 10,
+    marginRight: 8,
     fontSize: 14,
     fontWeight: 'bold',
   },
   
   subsectionTitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#000000',
-    marginTop: 20,
-    marginBottom: 8,
-    marginLeft: 15,
+    marginTop: 15,
+    marginBottom: 10,
+    marginLeft: 20,
   },
   
   subsectionNumber: {
     color: '#000000',
-    marginRight: 8,
-    fontSize: 11,
+    marginRight: 6,
+    fontSize: 12,
     fontWeight: 'bold',
   },
   
   description: {
     fontSize: 11,
-    color: '#000000',
-    marginBottom: 12,
-    lineHeight: 1.5,
+    color: '#333333',
+    marginBottom: 15,
+    lineHeight: 1.6,
+    textAlign: 'justify',
   },
   
   subsectionDescription: {
@@ -168,53 +170,53 @@ const styles = StyleSheet.create({
   },
   
   bulletList: {
-    marginLeft: 30,
-    marginTop: 8,
-    marginBottom: 12,
+    marginLeft: 40,
+    marginTop: 10,
+    marginBottom: 15,
   },
   
   bulletItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   
   bulletPoint: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#6B7280',
-    marginRight: 10,
-    marginTop: 2,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#000000',
+    marginRight: 12,
+    marginTop: 5,
     flexShrink: 0,
   },
   
   bulletText: {
-    fontSize: 10,
-    color: '#374151',
+    fontSize: 11,
+    color: '#000000',
     flex: 1,
-    lineHeight: 1.4,
+    lineHeight: 1.5,
   },
 
   // Descriptions en ligne
   inlineDescription: {
     fontSize: 11,
     fontStyle: 'italic',
-    color: '#000000',
+    color: '#666666',
     fontWeight: 'normal',
   },
   
   inlineDescriptionSub: {
     fontSize: 10,
     fontStyle: 'italic',
-    color: '#000000',
+    color: '#666666',
     fontWeight: 'normal',
   },
   
   inlineDescriptionBullet: {
-    fontSize: 9,
+    fontSize: 10,
     fontStyle: 'italic',
-    color: '#000000',
+    color: '#666666',
     fontWeight: 'normal',
   },
   
