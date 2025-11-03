@@ -13,7 +13,10 @@ import {
   Loader2,
   ChevronDown,
   ChevronRight,
+  Download,
 } from 'lucide-react';
+import { pdf } from '@react-pdf/renderer';
+import SpecificationPDF from './SpecificationPDF';
 
 export default function SpecificationDetail({ specification, onBack }) {
   const [features, setFeatures] = useState([]);
@@ -248,6 +251,35 @@ export default function SpecificationDetail({ specification, onBack }) {
         })) : []
       };
     });
+  };
+
+  // Fonction pour exporter en PDF
+  const exportToPDF = async () => {
+    try {
+      const blob = await pdf(
+        <SpecificationPDF 
+          specification={specification}
+          features={features}
+          generateTableOfContents={generateTableOfContents}
+          getChildren={getChildren}
+          levelList={levelList}
+        />
+      ).toBlob();
+      
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `cahier-des-charges-${specification.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast.addToast('PDF exporté avec succès', { type: 'success' });
+    } catch (error) {
+      console.error('Erreur lors de l\'export PDF:', error);
+      toast.addToast('Erreur lors de l\'export PDF', { type: 'error' });
+    }
   };
 
   // Inline component to render a feature and its nested children
@@ -496,27 +528,41 @@ export default function SpecificationDetail({ specification, onBack }) {
       {/* Onglets */}
       <div className="bg-white/50 backdrop-blur-sm border-b border-slate-200/50">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
-          <div className="flex">
-            <button
-              onClick={() => setActiveTab('document')}
-              className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium border-b-2 transition-all duration-200 ${
-                activeTab === 'document'
-                  ? 'border-blue-600 text-blue-600 bg-blue-50/50'
-                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
-              }`}
-            >
-              📄 Cahier des charges
-            </button>
-            <button
-              onClick={() => setActiveTab('tasks')}
-              className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium border-b-2 transition-all duration-200 ${
-                activeTab === 'tasks'
-                  ? 'border-blue-600 text-blue-600 bg-blue-50/50'
-                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
-              }`}
-            >
-              ✅ Tâches
-            </button>
+          <div className="flex justify-between items-center">
+            <div className="flex">
+              <button
+                onClick={() => setActiveTab('document')}
+                className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium border-b-2 transition-all duration-200 ${
+                  activeTab === 'document'
+                    ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
+                }`}
+              >
+                📄 Cahier des charges
+              </button>
+              <button
+                onClick={() => setActiveTab('tasks')}
+                className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium border-b-2 transition-all duration-200 ${
+                  activeTab === 'tasks'
+                    ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
+                }`}
+              >
+                ✅ Tâches
+              </button>
+            </div>
+            
+            {/* Bouton Export PDF - visible uniquement dans l'onglet document */}
+            {activeTab === 'document' && features.length > 0 && (
+              <button
+                onClick={exportToPDF}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300 text-sm"
+              >
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline">Exporter PDF</span>
+                <span className="sm:hidden">PDF</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
