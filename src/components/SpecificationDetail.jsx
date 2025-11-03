@@ -502,130 +502,128 @@ export default function SpecificationDetail() {
 
   if (loading || !specification) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
-      <header className="bg-white/90 backdrop-blur-md border-b border-slate-200/50 shadow-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2 sm:gap-4">
-              <button
-                onClick={() => navigate('/')}
-                className="flex items-center gap-1 sm:gap-2 text-slate-600 hover:text-slate-900 transition-all duration-200 group hover:bg-slate-100 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg"
-              >
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />
-                <span className="font-medium text-xs sm:text-sm">Retour</span>
-              </button>
-              <div className="min-w-0 flex-1">
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-900 bg-clip-text text-transparent">
-                  {specification.title}
-                </h1>
-                {specification.description && (
-                  <p className="text-slate-600 text-xs sm:text-sm mt-0.5 sm:mt-1 max-w-full sm:max-w-2xl truncate">
-                    {specification.description}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-wrap justify-end sm:justify-start">
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm">
-                <div className="text-xs font-medium opacity-90">Total</div>
-                <div className="text-sm sm:text-base lg:text-lg font-bold leading-tight">{features.length}</div>
-              </div>
-              
-              <div className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm">
-                <div className="text-xs font-medium opacity-90">OK</div>
-                <div className="text-sm sm:text-base lg:text-lg font-bold leading-tight">
-                  {features.filter(f => f.isCompleted).length}
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm">
-                <div className="text-xs font-medium opacity-90">%</div>
-                <div className="text-sm sm:text-base lg:text-lg font-bold leading-tight">{progressPercentage}%</div>
-              </div>
-
-              {activeTab === 'tasks' && (
-                <button
-                  onClick={() => setShowAddFeature(true)}
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-1 sm:gap-2 group text-xs sm:text-sm"
-                >
-                  <Plus className="w-3 sm:w-4 h-3 sm:h-4 group-hover:scale-110 transition-transform duration-200" />
-                  <span className="hidden xs:inline">Ajouter</span>
-                  <span className="xs:hidden">+</span>
-                </button>
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/specifications')}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors group hover:bg-gray-100 px-3 py-2 rounded-lg"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              <span className="font-medium">Retour</span>
+            </button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {specification.title}
+              </h1>
+              {specification.description && (
+                <p className="text-gray-600 mt-1">
+                  {specification.description}
+                </p>
               )}
             </div>
           </div>
+
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg">
+              <div className="text-xs font-medium">Total</div>
+              <div className="text-lg font-bold">{features.length}</div>
+            </div>
+            
+            <div className="bg-green-50 text-green-700 px-3 py-1.5 rounded-lg">
+              <div className="text-xs font-medium">Complétées</div>
+              <div className="text-lg font-bold">
+                {features.filter(f => f.isCompleted).length}
+              </div>
+            </div>
+
+            <div className="bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg">
+              <div className="text-xs font-medium">Progression</div>
+              <div className="text-lg font-bold">{progressPercentage}%</div>
+            </div>
+          </div>
         </div>
-      </header>
+      </div>
 
       {/* Onglets */}
-      <div className="bg-white/50 backdrop-blur-sm border-b border-slate-200/50">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
+      <div className="bg-white border border-gray-200 rounded-lg mb-6">
+        <div className="border-b border-gray-200">
           <div className="flex justify-between items-center">
             <div className="flex">
               <button
                 onClick={() => setActiveTab('document')}
-                className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium border-b-2 transition-all duration-200 ${
+                className={`px-6 py-4 text-base font-medium border-b-2 transition-all ${
                   activeTab === 'document'
-                    ? 'border-blue-600 text-blue-600 bg-blue-50/50'
-                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
+                    ? 'border-blue-600 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
                 📄 Cahier des charges
               </button>
               <button
                 onClick={() => setActiveTab('tasks')}
-                className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium border-b-2 transition-all duration-200 ${
+                className={`px-6 py-4 text-base font-medium border-b-2 transition-all ${
                   activeTab === 'tasks'
-                    ? 'border-blue-600 text-blue-600 bg-blue-50/50'
-                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
+                    ? 'border-blue-600 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
                 ✅ Tâches
               </button>
             </div>
             
-            {/* Bouton Export PDF - visible uniquement dans l'onglet document */}
-            {activeTab === 'document' && features.length > 0 && (
-              <button
-                onClick={exportToPDF}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300 text-sm"
-              >
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Exporter PDF</span>
-                <span className="sm:hidden">PDF</span>
-              </button>
-            )}
+            <div className="flex items-center gap-2 px-4">
+              {activeTab === 'document' && features.length > 0 && (
+                <button
+                  onClick={exportToPDF}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium shadow-sm hover:shadow-md transition-all text-sm"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Exporter PDF</span>
+                </button>
+              )}
+              
+              {activeTab === 'tasks' && (
+                <button
+                  onClick={() => setShowAddFeature(true)}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  Ajouter une tâche
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4">
+        {/* Contenu principal */}
+        <div className="p-6">
         {activeTab === 'document' ? (
           // Vue Cahier des charges (PDF-like)
-          <div className="bg-white shadow-xl rounded-lg border border-slate-200 min-h-[800px] p-8 sm:p-12">
+          <div className="bg-white shadow-lg rounded-lg border border-gray-200 min-h-[800px] p-8 sm:p-12">
             {/* En-tête du document */}
-            <div className="text-center mb-12 border-b border-black pb-8">
-              <h1 className="text-3xl sm:text-4xl font-bold text-black mb-4">
+            <div className="text-center mb-12 border-b border-gray-900 pb-8">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                 CAHIER DES CHARGES
               </h1>
-              <h2 className="text-xl sm:text-2xl text-black font-normal">
+              <h2 className="text-xl sm:text-2xl text-gray-900 font-normal">
                 {specification.title}
               </h2>
               {specification.description && (
-                <p className="text-black mt-4 text-base max-w-4xl mx-auto leading-normal">
+                <p className="text-gray-900 mt-4 text-base max-w-4xl mx-auto leading-normal">
                   {specification.description}
                 </p>
               )}
-              <div className="mt-6 text-sm text-black">
+              <div className="mt-6 text-sm text-gray-700">
                 Document généré le {new Date().toLocaleDateString('fr-FR')}
               </div>
             </div>
@@ -818,7 +816,7 @@ export default function SpecificationDetail() {
             )}
           </>
         )}
-      </main>
+        </div>
 
       {showAddFeature && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50">
@@ -884,6 +882,7 @@ export default function SpecificationDetail() {
           </div>
         </div>
       )}
+    </div>
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-60">

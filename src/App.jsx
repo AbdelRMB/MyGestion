@@ -1,7 +1,8 @@
-import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import Auth from './components/Auth';
+import Layout from './components/Layout/Layout';
+import Dashboard from './components/Dashboard/Dashboard';
 import SpecificationsList from './components/SpecificationsList';
 import SpecificationDetail from './components/SpecificationDetail';
 import { Loader2 } from 'lucide-react';
@@ -24,9 +25,13 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<SpecificationsList />} />
-        <Route path="/specifications/:id" element={<SpecificationDetail />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="specifications" element={<SpecificationsList />} />
+          <Route path="specifications/:id" element={<SpecificationDetail />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Router>
   );
