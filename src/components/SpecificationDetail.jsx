@@ -122,59 +122,102 @@ export default function SpecificationDetail({ specification, onBack }) {
 
   // Prevent toggling a feature that has children (they are auto-managed)
   const toggleFeatureCompletion = async (feature) => {
-    if (hasChildren(feature.id)) return;
+    if (hasChildren(feature.id)) {
+      console.log(`Feature ${feature.id} has children, cannot toggle directly`);
+      return;
+    }
     
     const wasCompleted = feature.isCompleted;
     
     try {
+      console.log(`Toggling feature ${feature.id} from ${wasCompleted} to ${!wasCompleted}`);
       await featuresAPI.update(feature.id, { isCompleted: !feature.isCompleted });
       toast.addToast(wasCompleted ? 'Tâche réouverte' : 'Tâche complétée', { type: 'success' });
       
       // reconcile parents after a child changed - this will reload features internally
+      console.log(`Starting parent reconciliation for feature ${feature.id}`);
       await reconcileParentsFrom(feature.id);
     } catch (error) {
+      console.error(`Error toggling feature ${feature.id}:`, error);
       toast.addToast(error.message || 'Erreur lors de la mise à jour', { type: 'error' });
     }
   };
 
   // After a child (id) changed, ensure parent tasks reflect children completion state
   const reconcileParentsFrom = async (childId) => {
-    // Reload features first to get latest state
-    await loadFeatures();
-    
-    let current = features.find((f) => f.id === childId);
-    if (!current) return;
-    
-    let parentId = current.parentId ?? null;
-    let hasUpdated = false;
-    
-    // walk up the chain
-    while (parentId) {
-      const parent = features.find((f) => f.id === parentId);
-      if (!parent) break;
+    try {
+      // Get fresh data from server
+      const freshData = await featuresAPI.getBySpecification(specification.id);
+      const freshFeatures = Array.isArray(freshData) ? freshData : [];
       
-      const children = getChildren(parent.id);
-      const allDone = children.length > 0 && children.every((c) => c.isCompleted === true);
-      
-      try {
-        if (allDone && !parent.isCompleted) {
-          await featuresAPI.update(parent.id, { isCompleted: true });
-          hasUpdated = true;
-        } else if (!allDone && parent.isCompleted) {
-          await featuresAPI.update(parent.id, { isCompleted: false });
-          hasUpdated = true;
+      // Build fresh children map
+      const freshChildrenMap = freshFeatures.reduce((acc, f) => {
+        const pid = f.parentId ?? null;
+        if (pid !== null && pid !== undefined) {
+          acc[pid] = acc[pid] || [];
+          acc[pid].push(f);
         }
-      } catch (err) {
-        console.warn('Reconcile parent error', err);
+        return acc;
+      }, {});
+      
+      const getFreshChildren = (id) => (freshChildrenMap[id] ? [...freshChildrenMap[id]] : []);
+      
+      let current = freshFeatures.find((f) => f.id === childId);
+      if (!current) {
+        await loadFeatures(); // Update UI state
+        return;
       }
       
-      // move up to next parent
-      parentId = parent.parentId ?? null;
-    }
-    
-    // Reload features one final time if we made updates
-    if (hasUpdated) {
-      await loadFeatures();
+      let parentId = current.parentId ?? null;
+      let hasUpdated = false;
+      
+      console.log(`Starting reconciliation for child ${childId}, parent: ${parentId}`);
+      
+      // walk up the chain
+      while (parentId) {
+        const parent = freshFeatures.find((f) => f.id === parentId);
+        if (!parent) {
+          console.log(`Parent ${parentId} not found, breaking`);
+          break;
+        }
+        
+        const children = getFreshChildren(parent.id);
+        const allDone = children.length > 0 && children.every((c) => c.isCompleted === true);
+        
+        console.log(`Checking parent ${parent.id} (${parent.title}): ${children.length} children, all done: ${allDone}, parent completed: ${parent.isCompleted}`);
+        
+        try {
+          if (allDone && !parent.isCompleted) {
+            console.log(`Auto-completing parent ${parent.id}`);
+            await featuresAPI.update(parent.id, { isCompleted: true });
+            hasUpdated = true;
+            
+            // Update parent in fresh data for next iteration
+            parent.isCompleted = true;
+          } else if (!allDone && parent.isCompleted) {
+            console.log(`Auto-uncompleting parent ${parent.id}`);
+            await featuresAPI.update(parent.id, { isCompleted: false });
+            hasUpdated = true;
+            
+            // Update parent in fresh data for next iteration
+            parent.isCompleted = false;
+          }
+        } catch (err) {
+          console.warn('Reconcile parent error', err);
+        }
+        
+        // move up to next parent
+        parentId = parent.parentId ?? null;
+      }
+      
+      // Reload UI state if we made updates
+      if (hasUpdated) {
+        console.log('Reloading features after reconciliation');
+        await loadFeatures();
+      }
+    } catch (error) {
+      console.error('Error in reconcileParentsFrom:', error);
+      await loadFeatures(); // Ensure UI is updated even on error
     }
   };
 
