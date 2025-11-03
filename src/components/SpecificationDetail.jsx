@@ -643,14 +643,16 @@ export default function SpecificationDetail({ specification, onBack }) {
                     <div key={item.id}>
                       {/* Section Niveau 1 */}
                       <div id={`section-${item.id}`} className="scroll-mt-24">
-                        <h2 className="text-xl font-bold text-black mb-4 border-b border-black pb-2">
-                          {item.index}. {item.title}
-                        </h2>
-                        {item.description && (
-                          <p className="text-black mb-6 leading-normal">
-                            {item.description}
-                          </p>
-                        )}
+                        <div className="border-b border-black pb-2 mb-4">
+                          <h2 className="text-xl font-bold text-black">
+                            {item.index}. {item.title}
+                            {item.description && (
+                              <span className="text-sm font-normal italic ml-4">
+                                {item.description}
+                              </span>
+                            )}
+                          </h2>
+                        </div>
 
                         {/* Sous-sections Niveau 2 */}
                         {item.children.length > 0 && (
@@ -659,12 +661,12 @@ export default function SpecificationDetail({ specification, onBack }) {
                               <div key={child.id} id={`section-${child.id}`} className="scroll-mt-24">
                                 <h3 className="text-lg font-bold text-black mb-3 ml-4">
                                   {child.index} {child.title}
+                                  {child.description && (
+                                    <span className="text-sm font-normal italic ml-4">
+                                      {child.description}
+                                    </span>
+                                  )}
                                 </h3>
-                                {child.description && (
-                                  <p className="text-black mb-4 leading-normal ml-4">
-                                    {child.description}
-                                  </p>
-                                )}
 
                                 {/* Éléments Niveau 3 */}
                                 {child.children.length > 0 && (
@@ -675,12 +677,12 @@ export default function SpecificationDetail({ specification, onBack }) {
                                         <div className="flex-1">
                                           <h4 className="font-normal text-black mb-1">
                                             {grandChild.title}
+                                            {grandChild.description && (
+                                              <span className="text-xs italic ml-2">
+                                                {grandChild.description}
+                                              </span>
+                                            )}
                                           </h4>
-                                          {grandChild.description && (
-                                            <p className="text-black text-sm leading-normal">
-                                              {grandChild.description}
-                                            </p>
-                                          )}
                                         </div>
                                       </div>
                                     ))}

@@ -195,6 +195,28 @@ const styles = StyleSheet.create({
     flex: 1,
     lineHeight: 1.4,
   },
+
+  // Descriptions en ligne
+  inlineDescription: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: '#000000',
+    fontWeight: 'normal',
+  },
+  
+  inlineDescriptionSub: {
+    fontSize: 10,
+    fontStyle: 'italic',
+    color: '#000000',
+    fontWeight: 'normal',
+  },
+  
+  inlineDescriptionBullet: {
+    fontSize: 9,
+    fontStyle: 'italic',
+    color: '#000000',
+    fontWeight: 'normal',
+  },
   
   bulletTitle: {
     fontWeight: 'bold',
@@ -310,24 +332,26 @@ const SpecificationPDF = ({ specification, features, generateTableOfContents, ge
               {/* Section Niveau 1 */}
               <View style={styles.sectionTitle} id={`section-${item.id}`}>
                 <Text style={styles.sectionNumber}>{item.index}</Text>
-                <Text style={{ flex: 1 }}>{item.title}</Text>
+                <Text style={{ flex: 1 }}>
+                  {item.title}
+                  {item.description && (
+                    <Text style={styles.inlineDescription}> {item.description}</Text>
+                  )}
+                </Text>
               </View>
-              
-              {item.description && (
-                <Text style={styles.description}>{item.description}</Text>
-              )}
 
               {/* Sous-sections Niveau 2 */}
               {item.children.map((child) => (
                 <View key={child.id}>
                   <View style={styles.subsectionTitle} id={`section-${child.id}`}>
                     <Text style={styles.subsectionNumber}>{child.index}</Text>
-                    <Text style={{ flex: 1 }}>{child.title}</Text>
+                    <Text style={{ flex: 1 }}>
+                      {child.title}
+                      {child.description && (
+                        <Text style={styles.inlineDescriptionSub}> {child.description}</Text>
+                      )}
+                    </Text>
                   </View>
-                  
-                  {child.description && (
-                    <Text style={styles.subsectionDescription}>{child.description}</Text>
-                  )}
 
                   {/* Éléments Niveau 3 */}
                   {child.children && child.children.length > 0 && (
@@ -336,10 +360,12 @@ const SpecificationPDF = ({ specification, features, generateTableOfContents, ge
                         <View key={grandChild.id} style={styles.bulletItem}>
                           <View style={styles.bulletPoint} />
                           <View style={{ flex: 1 }}>
-                            <Text style={styles.bulletTitle}>{grandChild.title}</Text>
-                            {grandChild.description && (
-                              <Text style={styles.bulletText}>{grandChild.description}</Text>
-                            )}
+                            <Text style={styles.bulletTitle}>
+                              {grandChild.title}
+                              {grandChild.description && (
+                                <Text style={styles.inlineDescriptionBullet}> {grandChild.description}</Text>
+                              )}
+                            </Text>
                           </View>
                         </View>
                       ))}
@@ -355,10 +381,12 @@ const SpecificationPDF = ({ specification, features, generateTableOfContents, ge
                     <View key={child.id} style={styles.bulletItem}>
                       <View style={styles.bulletPoint} />
                       <View style={{ flex: 1 }}>
-                        <Text style={styles.bulletTitle}>{child.title}</Text>
-                        {child.description && (
-                          <Text style={styles.bulletText}>{child.description}</Text>
-                        )}
+                        <Text style={styles.bulletTitle}>
+                          {child.title}
+                          {child.description && (
+                            <Text style={styles.inlineDescriptionBullet}> {child.description}</Text>
+                          )}
+                        </Text>
                       </View>
                     </View>
                   ))}
