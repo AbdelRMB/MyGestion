@@ -5,6 +5,8 @@ import Layout from './components/Layout/Layout';
 import Dashboard from './components/Dashboard/Dashboard';
 import SpecificationsList from './components/SpecificationsList';
 import SpecificationDetail from './components/SpecificationDetail';
+import QuotesList from './components/Quotes/QuotesList';
+import QuoteDetail from './components/Quotes/QuoteDetail';
 import { Loader2 } from 'lucide-react';
 
 function App() {
@@ -30,6 +32,9 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="specifications" element={<SpecificationsList />} />
           <Route path="specifications/:id" element={<SpecificationDetail />} />
+          <Route path="quotes" element={<QuotesList />} />
+          <Route path="quotes/:id" element={<QuoteDetail />} />
+          <Route path="quotes/:id/edit" element={<QuoteDetail />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

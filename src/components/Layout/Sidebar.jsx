@@ -7,7 +7,8 @@ import {
   X,
   ChevronRight,
   LogOut,
-  User
+  User,
+  Euro
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -23,6 +24,12 @@ const menuItems = [
     label: 'Cahiers des charges',
     icon: FileText,
     path: '/specifications',
+  },
+  {
+    id: 'quotes',
+    label: 'Devis',
+    icon: Euro,
+    path: '/quotes',
   },
   // Modules futurs à ajouter ici
 ];

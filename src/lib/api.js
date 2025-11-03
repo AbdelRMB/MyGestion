@@ -162,3 +162,109 @@ export const featuresAPI = {
     if (!response.ok) throw new Error('Erreur lors de la suppression');
   },
 };
+
+export const quotesAPI = {
+  getAll: async (params = {}) => {
+    const searchParams = new URLSearchParams();
+    
+    if (params.page) searchParams.append('page', params.page);
+    if (params.limit) searchParams.append('limit', params.limit);
+    if (params.status && params.status !== 'all') searchParams.append('status', params.status);
+    if (params.search) searchParams.append('search', params.search);
+
+    const url = `${API_URL}/quotes${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    
+    const response = await fetch(url, {
+      headers: getAuthHeaders(),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors du chargement des devis');
+    
+    return data.quotes || data; // Gère les deux formats de réponse
+  },
+
+  getById: async (id) => {
+    const response = await fetch(`${API_URL}/quotes/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors du chargement du devis');
+    
+    return data;
+  },
+
+  create: async (quoteData) => {
+    const response = await fetch(`${API_URL}/quotes`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(quoteData),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la création du devis');
+    
+    return data;
+  },
+
+  update: async (id, quoteData) => {
+    const response = await fetch(`${API_URL}/quotes/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(quoteData),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la mise à jour du devis');
+    
+    return data;
+  },
+
+  delete: async (id) => {
+    const response = await fetch(`${API_URL}/quotes/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Erreur lors de la suppression du devis');
+    }
+  },
+
+  updateStatus: async (id, status) => {
+    const response = await fetch(`${API_URL}/quotes/${id}/status`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ status }),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la mise à jour du statut');
+    
+    return data;
+  },
+
+  duplicate: async (id) => {
+    const response = await fetch(`${API_URL}/quotes/${id}/duplicate`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors de la duplication du devis');
+    
+    return data;
+  },
+
+  sendByEmail: async (id) => {
+    // Pour le moment, on simule l'envoi par email
+    // Dans une vraie application, ceci ferait appel à un service d'email
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ success: true, message: 'Devis envoyé par email' });
+      }, 1000);
+    });
+  }
+};
