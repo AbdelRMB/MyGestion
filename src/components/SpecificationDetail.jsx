@@ -288,15 +288,15 @@ export default function SpecificationDetail({ specification, onBack }) {
     const expandedForThis = !!expanded[feature.id];
 
     const levelColors = {
-      1: 'border-blue-200 bg-gradient-to-r from-blue-50/50 to-indigo-50/50',
-      2: 'border-purple-200 bg-gradient-to-r from-purple-50/50 to-pink-50/50',
-      3: 'border-emerald-200 bg-gradient-to-r from-emerald-50/50 to-teal-50/50'
+      1: 'border-gray-300 bg-white',
+      2: 'border-gray-200 bg-gray-50',
+      3: 'border-gray-200 bg-gray-25'
     };
 
     const levelBadgeColors = {
-      1: 'bg-blue-100 text-blue-700 border-blue-200',
-      2: 'bg-purple-100 text-purple-700 border-purple-200',
-      3: 'bg-emerald-100 text-emerald-700 border-emerald-200'
+      1: 'bg-gray-800 text-white border-gray-800',
+      2: 'bg-gray-700 text-white border-gray-700',
+      3: 'bg-gray-600 text-white border-gray-600'
     };
 
     return (
@@ -572,19 +572,19 @@ export default function SpecificationDetail({ specification, onBack }) {
           // Vue Cahier des charges (PDF-like)
           <div className="bg-white shadow-xl rounded-lg border border-slate-200 min-h-[800px] p-8 sm:p-12">
             {/* En-tête du document */}
-            <div className="text-center mb-12 border-b-2 border-slate-200 pb-8">
-              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+            <div className="text-center mb-12 border-b border-gray-300 pb-8">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 tracking-wide">
                 CAHIER DES CHARGES
               </h1>
-              <h2 className="text-xl sm:text-2xl text-blue-800 font-semibold">
+              <h2 className="text-xl sm:text-2xl text-gray-800 font-semibold">
                 {specification.title}
               </h2>
               {specification.description && (
-                <p className="text-slate-600 mt-4 text-lg max-w-4xl mx-auto leading-relaxed">
+                <p className="text-gray-600 mt-4 text-lg max-w-4xl mx-auto leading-relaxed">
                   {specification.description}
                 </p>
               )}
-              <div className="mt-6 text-sm text-slate-500">
+              <div className="mt-6 text-sm text-gray-500">
                 Document généré le {new Date().toLocaleDateString('fr-FR')}
               </div>
             </div>
@@ -601,35 +601,35 @@ export default function SpecificationDetail({ specification, onBack }) {
               <>
                 {/* Table des matières */}
                 <div className="mb-12">
-                  <h2 className="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-300 pb-2">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-400 pb-2 tracking-wide">
                     TABLE DES MATIÈRES
                   </h2>
                   <div className="space-y-2">
                     {generateTableOfContents().map((item) => (
                       <div key={item.id}>
                         {/* Niveau 1 */}
-                        <div className="flex justify-between items-center py-2 border-b border-dotted border-slate-200">
+                        <div className="flex justify-between items-center py-2 border-b border-dotted border-gray-300">
                           <button
                             onClick={() => document.getElementById(`section-${item.id}`)?.scrollIntoView({ behavior: 'smooth' })}
-                            className="font-semibold text-slate-900 hover:text-blue-600 transition-colors cursor-pointer text-left"
+                            className="font-semibold text-gray-900 hover:text-gray-700 transition-colors cursor-pointer text-left"
                           >
                             {item.index}. {item.title}
                           </button>
-                          <span className="text-slate-400">
+                          <span className="text-gray-400">
                             {item.children.length > 0 ? '.....................' : '- - - - - - - - - -'}
                           </span>
                         </div>
                         
                         {/* Niveau 2 */}
                         {item.children.map((child) => (
-                          <div key={child.id} className="flex justify-between items-center py-1 ml-6 text-sm border-b border-dotted border-slate-100">
+                          <div key={child.id} className="flex justify-between items-center py-1 ml-6 text-sm border-b border-dotted border-gray-200">
                             <button
                               onClick={() => document.getElementById(`section-${child.id}`)?.scrollIntoView({ behavior: 'smooth' })}
-                              className="text-slate-700 hover:text-blue-600 transition-colors cursor-pointer text-left"
+                              className="text-gray-700 hover:text-gray-600 transition-colors cursor-pointer text-left"
                             >
                               {child.index} {child.title}
                             </button>
-                            <span className="text-slate-300">- - - - - - -</span>
+                            <span className="text-gray-300">- - - - - - -</span>
                           </div>
                         ))}
                       </div>
@@ -643,14 +643,14 @@ export default function SpecificationDetail({ specification, onBack }) {
                     <div key={item.id}>
                       {/* Section Niveau 1 */}
                       <div id={`section-${item.id}`} className="scroll-mt-24">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-4 border-b-2 border-blue-600 pb-2 flex items-center gap-3">
-                          <span className="bg-blue-600 text-white px-3 py-1 rounded-lg text-lg">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4 border-b-2 border-gray-600 pb-2 flex items-center gap-3">
+                          <span className="bg-gray-800 text-white px-3 py-1 rounded text-lg font-medium">
                             {item.index}
                           </span>
                           {item.title}
                         </h2>
                         {item.description && (
-                          <p className="text-slate-700 mb-6 leading-relaxed bg-slate-50 p-4 rounded-lg border-l-4 border-blue-600">
+                          <p className="text-gray-700 mb-6 leading-relaxed bg-gray-50 p-4 rounded border-l-4 border-gray-600">
                             {item.description}
                           </p>
                         )}
@@ -660,14 +660,14 @@ export default function SpecificationDetail({ specification, onBack }) {
                           <div className="ml-4 space-y-6">
                             {item.children.map((child) => (
                               <div key={child.id} id={`section-${child.id}`} className="scroll-mt-24">
-                                <h3 className="text-xl font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                                  <span className="bg-purple-600 text-white px-2 py-1 rounded text-sm">
+                                <h3 className="text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                  <span className="bg-gray-700 text-white px-2 py-1 rounded text-sm font-medium">
                                     {child.index}
                                   </span>
                                   {child.title}
                                 </h3>
                                 {child.description && (
-                                  <p className="text-slate-600 mb-4 leading-relaxed bg-purple-50 p-3 rounded border-l-4 border-purple-600">
+                                  <p className="text-gray-600 mb-4 leading-relaxed bg-gray-100 p-3 rounded border-l-4 border-gray-700">
                                     {child.description}
                                   </p>
                                 )}
@@ -677,7 +677,7 @@ export default function SpecificationDetail({ specification, onBack }) {
                                   <div className="ml-4 space-y-3">
                                     {child.children.map((grandChild, idx) => (
                                       <div key={grandChild.id} className="flex items-start gap-3">
-                                        <span className="flex-shrink-0 w-6 h-6 bg-emerald-600 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">
+                                        <span className="flex-shrink-0 w-6 h-6 bg-gray-600 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">
                                           •
                                         </span>
                                         <div className="flex-1">
