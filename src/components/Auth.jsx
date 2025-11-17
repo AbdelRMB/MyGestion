@@ -104,7 +104,7 @@ export default function Auth() {
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        {/* <div className="mt-6 text-center">
           <button
             onClick={() => {
               setIsLogin(!isLogin);
@@ -116,7 +116,7 @@ export default function Auth() {
               ? "Pas encore de compte? Créez-en un"
               : "Déjà un compte? Connectez-vous"}
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
